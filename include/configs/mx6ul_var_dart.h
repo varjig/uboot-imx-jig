@@ -141,12 +141,12 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"script=boot.scr\0" \
-	"image=zImage\0" \
+	"image=jig-zImage\0" \
 	"console=ttymxc0\0" \
 	"fdt_high=0xffffffff\0" \
 	"var_auto_fdt_file=N\0" \
 	"initrd_high=0xffffffff\0" \
-	"fdt_file=imx6ul-var-dart-sd_emmc.dtb\0" \
+	"fdt_file=\0" \
 	"fdt_addr=0x83000000\0" \
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \
