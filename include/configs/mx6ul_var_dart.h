@@ -140,6 +140,23 @@
 #else
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	"choose_dtb=if test ${wifi} = yes; then " \
+		"if test ${emmc} = yes; then " \
+			"setenv fdt_file jig-imx6ul-var-dart-emmc_wifi.dtb; " \
+		"else " \
+			"setenv fdt_file jig-imx6ul-var-dart-nand_wifi.dtb; " \
+		"fi; " \
+	"else " \
+		"if test ${emmc} = yes; " \
+		"then " \
+			"setenv fdt_file jig-imx6ul-var-dart-sd_emmc.dtb; " \
+		"else " \
+			"setenv fdt_file jig-imx6ul-var-dart-sd_nand.dtb; " \
+		"fi; " \
+	"fi; " \
+	"echo Using ${fdt_file} file;\0" \
+	"emmc=no\0" \
+	"wifi=no\0" \
 	"script=boot.scr\0" \
 	"image=jig-zImage\0" \
 	"console=ttymxc0\0" \
