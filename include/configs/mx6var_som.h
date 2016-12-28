@@ -479,7 +479,6 @@
 #endif
 
 /* Framebuffer */
-#define CONFIG_VIDEO
 #ifdef CONFIG_VIDEO
 #define CONFIG_VIDEO_IPUV3
 #define CONFIG_CFB_CONSOLE
