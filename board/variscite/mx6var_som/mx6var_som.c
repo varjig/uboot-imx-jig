@@ -500,17 +500,6 @@ static iomux_v3_cfg_t const usdhc2_pads[] = {
 	IOMUX_PADS(PAD_SD2_DAT3__SD2_DATA3	| MUX_PAD_CTRL(USDHC_PAD_CTRL)),
 };
 
-static iomux_v3_cfg_t const usdhc2_cd_pad[][1*2] = {
-	{
-		/* DART */
-		IOMUX_PADS(PAD_GPIO_6__GPIO1_IO06 | MUX_PAD_CTRL(NO_PAD_CTRL)),
-	},
-	{
-		/* Non-DART */
-		IOMUX_PADS(PAD_KEY_COL4__GPIO4_IO14 | MUX_PAD_CTRL(NO_PAD_CTRL)),
-	}
-};
-
 static iomux_v3_cfg_t const usdhc3_pads[] = {
 	IOMUX_PADS(PAD_SD3_CLK__SD3_CLK		| MUX_PAD_CTRL(USDHC_PAD_CTRL)),
 	IOMUX_PADS(PAD_SD3_CMD__SD3_CMD		| MUX_PAD_CTRL(USDHC_PAD_CTRL)),
@@ -569,30 +558,8 @@ static int mmc_map_to_kernel_blk(int dev_no)
 }
 #endif
 
-static int usdhc2_cd_gpio[] = {
-	/* DART */
-	IMX_GPIO_NR(1, 6),
-	/* Non-DART */
-	IMX_GPIO_NR(4, 14)
-};
-
 int board_mmc_getcd(struct mmc *mmc)
 {
-	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
-	int board = is_dart_board() ? 0 : 1;
-
-	/* SD card */
-	if (cfg->esdhc_base == USDHC2_BASE_ADDR) {
-		return !gpio_get_value(usdhc2_cd_gpio[board]);
-	}
-
-	/*
-	 * On DART SOMs eMMC is always present.
-	 *
-	 * On non DART SOMs eMMC can be present or not,
-	 * but we can't know until we try to init it
-	 * so return 1 here anyway
-	 */
 	return 1;
 }
 
@@ -614,7 +581,7 @@ static enum mmc_boot_device get_mmc_boot_device(void)
 int board_mmc_init(bd_t *bis)
 {
 #ifndef CONFIG_SPL_BUILD
-	int ret, i, board;
+	int ret, i;
 
 	/*
 	 * According to the board_mmc_init() the following map is done:
@@ -631,11 +598,6 @@ int board_mmc_init(bd_t *bis)
 		switch (i) {
 		case 0:
 			SETUP_IOMUX_PADS(usdhc2_pads);
-
-			board = is_dart_board() ? 0 : 1;
-			SETUP_IOMUX_PADS(usdhc2_cd_pad[board]);
-			gpio_direction_input(usdhc2_cd_gpio[board]);
-
 			usdhc_cfg[0].esdhc_base = USDHC2_BASE_ADDR;
 			usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
 			usdhc_cfg[0].max_bus_width = 4;
