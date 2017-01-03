@@ -168,8 +168,8 @@
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
 	"mmcautodetect=yes\0" \
-	"mmcargs=setenv bootargs console=${console},${baudrate} root=${mmcroot}; " \
-		"run videoargs\0" \
+	"mmcargs=setenv bootargs console=${console},${baudrate} root=${mmcroot} " \
+		"video=mxcfb0:dev=ldb video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off\0" \
 	"loadbootscript=" \
 		"fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
@@ -196,11 +196,11 @@
 
 #define NAND_BOOT_ENV_SETTINGS \
 	"bootargs_nand=setenv bootargs console=${console},${baudrate} ubi.mtd=3 " \
-		"root=ubi0:rootfs rootfstype=ubifs; " \
-		"run videoargs\0" \
+		"root=ubi0:rootfs rootfstype=ubifs " \
+		"video=mxcfb0:dev=ldb video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off\0" \
 	"bootargs_emmc=setenv bootargs console=${console},${baudrate} " \
-		"root=/dev/mmcblk0p1 rootwait rw; " \
-		"run videoargs\0" \
+		"root=/dev/mmcblk0p1 rootwait rw " \
+		"video=mxcfb0:dev=ldb video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off\0" \
 	"rootfs_device=nand\0" \
 	"bootcmd=" \
 		"if test ${rootfs_device} != emmc; then " \
@@ -235,23 +235,9 @@
 #endif
 
 
-#define VIDEO_ENV_SETTINGS \
-	"videoargs=" \
-		"if hdmidet; then " \
-			"setenv bootargs ${bootargs} " \
-				"video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24; " \
-		"else " \
-			"setenv bootargs ${bootargs} " \
-				"video=mxcfb0:dev=ldb; " \
-		"fi; " \
-		"setenv bootargs ${bootargs} " \
-			"video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off;\0"
-
-
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	MFG_ENV_SETTINGS \
 	BOOT_ENV_SETTINGS \
-	VIDEO_ENV_SETTINGS \
 	"fdt_file=undefined\0" \
 	"fdt_addr=0x18000000\0" \
 	"fdt_high=0xffffffff\0" \
@@ -264,8 +250,8 @@
 	"console=" CONFIG_CONSOLE_DEV "\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/nfs rw " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp; " \
-		"run videoargs\0" \
+		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp " \
+		"video=mxcfb0:dev=ldb video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off\0" \
 	"netboot=echo Booting from net ...; " \
 		"run netargs; " \
 		"if test ${ip_dyn} = yes; then " \

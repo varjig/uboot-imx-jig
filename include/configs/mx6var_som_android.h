@@ -34,10 +34,8 @@
 
 #define BOOT_ENV_SETTINGS \
 	"bootcmd=" \
-		"run videoargs; " \
 		"boota ${boota_dev}\0" \
 	"bootcmd_android_recovery=" \
-		"run videoargs; " \
 		"boota ${recovery_dev} recovery\0" \
 	"fastboot_dev=mmc1\0" \
 	"boota_dev=mmc1\0" \
@@ -46,7 +44,6 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	BOOT_ENV_SETTINGS \
-	VIDEO_ENV_SETTINGS \
 	"splashpos=m,m\0" \
 	"fdt_high=0xffffffff\0" \
 	"initrd_high=0xffffffff\0" \
@@ -59,7 +56,8 @@
 		"androidboot.hardware=freescale " \
 		"cma=384M " \
 		"androidboot.dm_verity=disabled " \
-		"androidboot.selinux=disabled\0"
+		"androidboot.selinux=disabled " \
+		"video=mxcfb0:dev=ldb video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off\0"
 
 
 #define CONFIG_USB_FASTBOOT_BUF_ADDR   CONFIG_SYS_LOAD_ADDR
