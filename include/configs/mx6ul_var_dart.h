@@ -140,18 +140,36 @@
 #else
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"choose_dtb=if test ${wifi} = yes; then " \
-		"if test ${emmc} = yes; then " \
-			"setenv fdt_file jig-imx6ul-var-dart-emmc_wifi.dtb; " \
+	"choose_dtb=" \
+	"if test ${ull} = yes; then " \
+		"if test ${wifi} = yes; then " \
+			"if test ${emmc} = yes; then " \
+				"setenv fdt_file jig-imx6ull-var-dart-emmc_wifi.dtb; " \
+			"else " \
+				"setenv fdt_file jig-imx6ull-var-dart-nand_wifi.dtb; " \
+			"fi; " \
 		"else " \
-			"setenv fdt_file jig-imx6ul-var-dart-nand_wifi.dtb; " \
+			"if test ${emmc} = yes; " \
+			"then " \
+				"setenv fdt_file jig-imx6ull-var-dart-sd_emmc.dtb; " \
+			"else " \
+				"setenv fdt_file jig-imx6ull-var-dart-sd_nand.dtb; " \
+			"fi; " \
 		"fi; " \
 	"else " \
-		"if test ${emmc} = yes; " \
-		"then " \
-			"setenv fdt_file jig-imx6ul-var-dart-sd_emmc.dtb; " \
+		"if test ${wifi} = yes; then " \
+			"if test ${emmc} = yes; then " \
+				"setenv fdt_file jig-imx6ul-var-dart-emmc_wifi.dtb; " \
+			"else " \
+				"setenv fdt_file jig-imx6ul-var-dart-nand_wifi.dtb; " \
+			"fi; " \
 		"else " \
-			"setenv fdt_file jig-imx6ul-var-dart-sd_nand.dtb; " \
+			"if test ${emmc} = yes; " \
+			"then " \
+				"setenv fdt_file jig-imx6ul-var-dart-sd_emmc.dtb; " \
+			"else " \
+				"setenv fdt_file jig-imx6ul-var-dart-sd_nand.dtb; " \
+			"fi; " \
 		"fi; " \
 	"fi; " \
 	"echo Using ${fdt_file} file;\0" \
