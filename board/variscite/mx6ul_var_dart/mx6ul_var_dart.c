@@ -702,8 +702,6 @@ int board_late_init(void)
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	setenv("board_name", "MX6UL_VAR_DART");
 
-	setenv("board_rev", "01");
-
 	s = getenv ("var_auto_fdt_file");
 	if (s[0] != 'Y') return 0;
 
@@ -711,6 +709,7 @@ int board_late_init(void)
 
 	switch (get_boot_device()) {
 	case VBOOT_DEVICE_SD:
+		setenv("boot_dev", "sd");
 		switch (var_eeprom_config_struct_v2.som_info &0x3){
 			case 0x00:
 			case 0x02:
@@ -722,12 +721,14 @@ int board_late_init(void)
 		}
 		break;
 	case VBOOT_DEVICE_MMC:
+		setenv("boot_dev", "mmc");
 		if (var_eeprom_config_struct_v2.som_info & 0x4)
 				setenv("fdt_file", "imx6ul-var-dart-emmc_wifi.dtb");
 		else
 				setenv("fdt_file", "imx6ul-var-dart-sd_emmc.dtb");
 		break;
 	case VBOOT_DEVICE_NAND:
+		setenv("boot_dev", "nand");
 		if (var_eeprom_config_struct_v2.som_info & 0x4)
 				setenv("fdt_file", "imx6ul-var-dart-nand_wifi.dtb");
 		else
@@ -738,6 +739,20 @@ int board_late_init(void)
 		break;
 	}
 
+	if (var_eeprom_config_struct_v2.som_info & 0x4)
+		setenv("wifi", "yes");
+
+	switch ((var_eeprom_config_struct_v2.som_info >> 3) & 0x3) {
+		case 0x0:
+			setenv("som_rev", "1");
+			break;
+		case 0x1:
+			setenv("som_rev", "2");
+			break;
+		default:
+			setenv("som_rev", "unknown");
+			break;
+	}
 
 #endif
 
@@ -980,6 +995,19 @@ void board_init_f(ulong dummy)
 			printf("WIFI\n");
 		else
 			printf("\n");
+
+		switch ((var_eeprom_config_struct_v2.som_info >> 3) & 0x3) {
+			case 0x0:
+				printf("SOM rev: 1\n");
+				break;
+			case 0x1:
+				printf("SOM rev: 2\n");
+				break;
+			default:
+				printf("SOM rev: unknown\n");
+				break;
+	}
+
 	} else {
 		printf("DDR LEGACY configuration\n");
 	}

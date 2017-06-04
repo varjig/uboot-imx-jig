@@ -110,6 +110,7 @@
 		"root=ubi0:rootfs rootfstype=ubifs rw\0"\
 	"bootcmd=nand read ${loadaddr} 0x600000 0x600000;"\
 		"nand read ${fdt_addr} 0xde0000 0x20000;"\
+		"run fixupfdt; " \
 		"bootz ${loadaddr} - ${fdt_addr}\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/nfs " \
@@ -200,6 +201,7 @@
 		"run mmcargs; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if run loadfdt; then " \
+				"run fixupfdt; " \
 				"bootz ${loadaddr} - ${fdt_addr}; " \
 			"else " \
 				"if test ${boot_fdt} = try; then " \
@@ -210,6 +212,12 @@
 			"fi; " \
 		"else " \
 			"bootz; " \
+		"fi;\0" \
+	"fixupfdt=" \
+		"if test ${som_rev} = 2 && test ${wifi} = yes && test ${boot_dev} != sd; then " \
+			"fdt addr ${fdt_addr}; " \
+			"fdt rm /soc/aips-bus@02100000/usdhc@02190000 no-1-8-v; " \
+			"fdt set /regulators/regulator@1 status okay; " \
 		"fi;\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/nfs " \
@@ -224,6 +232,7 @@
 		"${get_cmd} ${image}; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
+				"run fixupfdt; " \
 				"bootz ${loadaddr} - ${fdt_addr}; " \
 			"else " \
 				"if test ${boot_fdt} = try; then " \
