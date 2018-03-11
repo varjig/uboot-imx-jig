@@ -172,7 +172,14 @@ int dram_init(void)
 	int eeprom_ram_size = var_eeprom_get_ram_size();
 
 	if (eeprom_ram_size > 0)
-		gd->ram_size = eeprom_ram_size;
+		if (get_ram_size((void *)PHYS_SDRAM, PHYS_SDRAM_SIZE) != eeprom_ram_size) {
+			printf("Error: RAM size from EEPROM: %d, RAM size from get_ram_size(): %ld\n",
+					eeprom_ram_size,
+					get_ram_size((void *)PHYS_SDRAM, PHYS_SDRAM_SIZE));
+			hang();
+		} else {
+			gd->ram_size = eeprom_ram_size;
+		}
 	else
 #endif
 		gd->ram_size = get_ram_size((void *)PHYS_SDRAM, PHYS_SDRAM_SIZE);
