@@ -110,7 +110,6 @@
 		"root=ubi0:rootfs rootfstype=ubifs rw\0"\
 	"bootcmd=nand read ${loadaddr} 0x600000 0x600000;"\
 		"nand read ${fdt_addr} 0xde0000 0x20000;"\
-		"run fixupfdt; " \
 		"bootz ${loadaddr} - ${fdt_addr}\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/nfs " \
@@ -143,9 +142,17 @@
 	"if test ${ull} = yes; then " \
 		"if test ${wifi} = yes; then " \
 			"if test ${emmc} = yes; then " \
-				"setenv fdt_file jig-imx6ull-var-dart-emmc_wifi.dtb; " \
+				"if test $som_rev = 2; then " \
+					"setenv fdt_file jig-imx6ull-var-dart-5g-emmc_wifi.dtb; " \
+				"else " \
+					"setenv fdt_file jig-imx6ull-var-dart-emmc_wifi.dtb; " \
+				"fi; " \
 			"else " \
-				"setenv fdt_file jig-imx6ull-var-dart-nand_wifi.dtb; " \
+				"if test $som_rev = 2; then " \
+					"setenv fdt_file jig-imx6ull-var-dart-5g-nand_wifi.dtb; " \
+				"else " \
+					"setenv fdt_file jig-imx6ull-var-dart-nand_wifi.dtb; " \
+				"fi; " \
 			"fi; " \
 		"else " \
 			"if test ${emmc} = yes; " \
@@ -158,9 +165,17 @@
 	"else " \
 		"if test ${wifi} = yes; then " \
 			"if test ${emmc} = yes; then " \
-				"setenv fdt_file jig-imx6ul-var-dart-emmc_wifi.dtb; " \
+				"if test $som_rev = 2; then " \
+					"setenv fdt_file jig-imx6ul-var-dart-5g-emmc_wifi.dtb; " \
+				"else " \
+					"setenv fdt_file jig-imx6ul-var-dart-emmc_wifi.dtb; " \
+				"fi; " \
 			"else " \
-				"setenv fdt_file jig-imx6ul-var-dart-nand_wifi.dtb; " \
+				"if test $som_rev = 2; then " \
+					"setenv fdt_file jig-imx6ul-var-dart-5g-nand_wifi.dtb; " \
+				"else " \
+					"setenv fdt_file jig-imx6ul-var-dart-nand_wifi.dtb; " \
+				"fi; " \
 			"fi; " \
 		"else " \
 			"if test ${emmc} = yes; " \
@@ -201,7 +216,6 @@
 		"run mmcargs; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if run loadfdt; then " \
-				"run fixupfdt; " \
 				"bootz ${loadaddr} - ${fdt_addr}; " \
 			"else " \
 				"if test ${boot_fdt} = try; then " \
@@ -212,12 +226,6 @@
 			"fi; " \
 		"else " \
 			"bootz; " \
-		"fi;\0" \
-	"fixupfdt=" \
-		"if test ${som_rev} = 2 && test ${wifi} = yes && test ${boot_dev} != sd; then " \
-			"fdt addr ${fdt_addr}; " \
-			"fdt rm /soc/aips-bus@02100000/usdhc@02190000 no-1-8-v; " \
-			"fdt set /regulators/regulator@1 status okay; " \
 		"fi;\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/nfs " \
@@ -232,7 +240,6 @@
 		"${get_cmd} ${image}; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
-				"run fixupfdt; " \
 				"bootz ${loadaddr} - ${fdt_addr}; " \
 			"else " \
 				"if test ${boot_fdt} = try; then " \
@@ -264,7 +271,7 @@
 #define CONFIG_SYS_MEMTEST_START	0x80000000
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + 0x10000000)
 
-#define CONFIG_CMD_SETEXPR
+/* #define CONFIG_CMD_SETEXPR */
 #define CONFIG_CMD_TIME
 
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
