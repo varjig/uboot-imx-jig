@@ -749,7 +749,6 @@ int board_late_init(void)
 {
 	char sdram_size_str[SDRAM_SIZE_STR_LEN];
 	struct var_eeprom_v2_cfg var_eeprom_v2_cfg = {0};
-	u32 imxtype, cpurev;
 
 #ifdef CONFIG_CMD_BMODE
 	add_board_boot_modes(board_boot_modes);
@@ -768,11 +767,10 @@ int board_late_init(void)
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	setenv("board_name", "MX6UL_VAR_DART");
 
-	cpurev = get_cpu_rev();
-	imxtype = (cpurev & 0xFF000) >> 12;
-
-	if (imxtype == MXC_CPU_MX6ULL)
+	if (is_cpu_type(MXC_CPU_MX6ULL))
 		setenv("soc_type", "imx6ull");
+	else if (is_cpu_type(MXC_CPU_MX6ULZ))
+		setenv("soc_type", "imx6ulz");
 	else
 		setenv("soc_type", "imx6ul");
 
