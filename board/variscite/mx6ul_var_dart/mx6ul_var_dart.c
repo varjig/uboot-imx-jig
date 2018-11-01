@@ -440,15 +440,17 @@ static iomux_v3_cfg_t const pwm_pads[] = {
 
 void do_enable_parallel_lcd(struct display_info_t const *dev)
 {
-	enable_lcdif_clock(dev->bus, 1);
+	if (!is_cpu_type(MXC_CPU_MX6ULZ)) {
+		enable_lcdif_clock(dev->bus, 1);
 
-	imx_iomux_v3_setup_multiple_pads(lcd_pads, ARRAY_SIZE(lcd_pads));
+		imx_iomux_v3_setup_multiple_pads(lcd_pads, ARRAY_SIZE(lcd_pads));
 
-	imx_iomux_v3_setup_multiple_pads(pwm_pads, ARRAY_SIZE(pwm_pads));
+		imx_iomux_v3_setup_multiple_pads(pwm_pads, ARRAY_SIZE(pwm_pads));
 
-	/* Set Brightness to high */
-	gpio_request(IMX_GPIO_NR(3, 5), "backlight");
-	gpio_direction_output(IMX_GPIO_NR(3, 5) , 1);
+		/* Set Brightness to high */
+		gpio_request(IMX_GPIO_NR(3, 5), "backlight");
+		gpio_direction_output(IMX_GPIO_NR(3, 5) , 1);
+	}
 }
 
 #define MHZ2PS(f)       (1000000/(f))
@@ -496,41 +498,43 @@ int splash_screen_prepare(void)
 {
 	int ret=0;
 
-	char sd_devpart_str[5];
-	char emmc_devpart_str[5];
-	u32 sd_part, emmc_part;
+	if (!is_cpu_type(MXC_CPU_MX6ULZ)) {
+		char sd_devpart_str[5];
+		char emmc_devpart_str[5];
+		u32 sd_part, emmc_part;
 
-	sd_part = emmc_part = getenv_ulong("mmcrootpart", 10, 0);
+		sd_part = emmc_part = getenv_ulong("mmcrootpart", 10, 0);
 
-	sprintf(sd_devpart_str, "0:%d", sd_part);
-	sprintf(emmc_devpart_str, "1:%d", emmc_part);
+		sprintf(sd_devpart_str, "0:%d", sd_part);
+		sprintf(emmc_devpart_str, "1:%d", emmc_part);
 
-	struct splash_location var_splash_locations[] = {
-		{
-			.name = "sd",
-			.storage = SPLASH_STORAGE_MMC,
-			.flags = SPLASH_STORAGE_FS,
-			.devpart = sd_devpart_str,
-		},
-		{
-			.name = "emmc",
-			.storage = SPLASH_STORAGE_MMC,
-			.flags = SPLASH_STORAGE_FS,
-			.devpart = emmc_devpart_str,
-		},
-		{
-			.name = "nand",
-			.storage = SPLASH_STORAGE_NAND,
-			.flags = SPLASH_STORAGE_FS,
-			.mtdpart = "rootfs",
-			.ubivol = "ubi0:rootfs",
-		},
-	};
+		struct splash_location var_splash_locations[] = {
+			{
+				.name = "sd",
+				.storage = SPLASH_STORAGE_MMC,
+				.flags = SPLASH_STORAGE_FS,
+				.devpart = sd_devpart_str,
+			},
+			{
+				.name = "emmc",
+				.storage = SPLASH_STORAGE_MMC,
+				.flags = SPLASH_STORAGE_FS,
+				.devpart = emmc_devpart_str,
+			},
+			{
+				.name = "nand",
+				.storage = SPLASH_STORAGE_NAND,
+				.flags = SPLASH_STORAGE_FS,
+				.mtdpart = "rootfs",
+				.ubivol = "ubi0:rootfs",
+			},
+		};
 
-	set_splashsource_to_boot_rootfs();
+		set_splashsource_to_boot_rootfs();
 
-	ret = splash_source_load(var_splash_locations,
-			ARRAY_SIZE(var_splash_locations));
+		ret = splash_source_load(var_splash_locations,
+				ARRAY_SIZE(var_splash_locations));
+	}
 
 	return ret;
 }
@@ -697,6 +701,10 @@ static void setup_local_i2c(void)
 
 int board_early_init_f(void)
 {
+#ifdef CONFIG_VIDEO_MXS
+	if (is_cpu_type(MXC_CPU_MX6ULZ))
+		display_count = 0;
+#endif
 	setup_iomux_uart();
 
 #ifdef CONFIG_SYS_I2C_MXC
