@@ -102,6 +102,7 @@
 
 /* Initial environment variables */
 #define CONFIG_EXTRA_ENV_SETTINGS		\
+	"bootdelay=-1\0"	\
 	"bootdir=/boot\0"	\
 	"script=boot.scr\0" \
 	"image=Image.gz\0" \
