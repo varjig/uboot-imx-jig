@@ -103,7 +103,7 @@
 /* Initial environment variables */
 #define CONFIG_EXTRA_ENV_SETTINGS		\
 	"bootdelay=-1\0"	\
-	"bootdir=/boot\0"	\
+	"bootdir=\0"	\
 	"script=boot.scr\0" \
 	"image=Image.gz\0" \
 	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
@@ -120,7 +120,7 @@
 	"mmcroot=" CONFIG_MMCROOT " rootfstype=ext4 rootwait rw\0" \
 	"mmcautodetect=yes\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
-	"mmcargs=setenv bootargs console=${console} root=${mmcroot} video=${video}\0 " \
+	"mmcargs=setenv bootargs console=${console} root=/dev/sda1 rootfstype=ext4 rootwait rw; video=${video}\0 " \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
