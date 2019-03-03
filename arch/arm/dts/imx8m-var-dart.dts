@@ -328,10 +328,9 @@
 
 /* SD card */
 &usdhc2 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	no-1-8-v;
 	bus-width = <4>;
 	non-removable;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
