@@ -2,7 +2,9 @@
  * Copyright 2017 NXP
  *
  * SPDX-License-Identifier:	GPL-2.0+
- * Generated code from MX8_DDR_tool
+ *
+ * Generated code from MX8M_DDR_tool
+ * Align with uboot-imx_v2017.03_4.9.51_imx8m_ga
  */
 
 #include <common.h>
@@ -32,6 +34,11 @@ volatile unsigned int tmp, tmp_t, i;
 void ddr_init(void)
 {
 	/** Initialize DDR clock and DDRC registers **/
+	reg32_write(0x30330234,0x0);
+	reg32_write(0x30330238,0x0);
+	reg32_write(0x3033049c,0xe);
+	reg32_write(0x303304a0,0xe);
+	reg32_write(0x303304f4,0x0);
 	reg32_write(0x3038a088,0x7070000);
 	reg32_write(0x3038a084,0x4030000);
 	reg32_write(0x303a00ec,0xffff);
@@ -63,7 +70,7 @@ void ddr_init(void)
 	reg32_write(0x3d400000,0xa3080020);
 	reg32_write(0x3d400028,0x0);
 	reg32_write(0x3d400020,0x203);
-	reg32_write(0x3d400024,0x186a000);
+	reg32_write(0x3d400024,0x3e800);
 	reg32_write(0x3d400064,0x6100e0);
 	reg32_write(0x3d4000d0,0xc003061c);
 	reg32_write(0x3d4000d4,0x9e0000);
@@ -82,7 +89,7 @@ void ddr_init(void)
 	reg32_write(0x3d400134,0xc100002);
 	reg32_write(0x3d400138,0xe6);
 	reg32_write(0x3d400144,0xa00050);
-	reg32_write(0x3d400180,0x3200018);
+	reg32_write(0x3d400180,0xc3200018);
 	reg32_write(0x3d400184,0x28061a8);
 	reg32_write(0x3d400188,0x0);
 	reg32_write(0x3d400190,0x497820a);
@@ -95,15 +102,15 @@ void ddr_init(void)
 	reg32_write(0x3d4001c0,0x1);
 	reg32_write(0x3d4001c4,0x1);
 	reg32_write(0x3d4000f4,0x639);
-	reg32_write(0x3d400108,0x70e1214);
-	reg32_write(0x3d400200,0x15);
+	reg32_write(0x3d400108,0x70e1617);
+	reg32_write(0x3d400200,0x16);
 	reg32_write(0x3d40020c,0x0);
 	reg32_write(0x3d400210,0x1f1f);
 	reg32_write(0x3d400204,0x80808);
 	reg32_write(0x3d400214,0x7070707);
-	reg32_write(0x3d400218,0x48080707);
+	reg32_write(0x3d400218,0xf070707);
 	reg32_write(0x3d402020,0x1);
-	reg32_write(0x3d402024,0x518b00);
+	reg32_write(0x3d402024,0xd0c0);
 	reg32_write(0x3d402050,0x20d040);
 	reg32_write(0x3d402064,0x14002f);
 	reg32_write(0x3d4020dc,0x940009);
@@ -122,7 +129,7 @@ void ddr_init(void)
 	reg32_write(0x3d402134,0xa100002);
 	reg32_write(0x3d402138,0x31);
 	reg32_write(0x3d402144,0x220011);
-	reg32_write(0x3d402180,0xa70006);
+	reg32_write(0x3d402180,0xc0a70006);
 	reg32_write(0x3d402190,0x3858202);
 	reg32_write(0x3d402194,0x80303);
 	reg32_write(0x3d4021b4,0x502);
@@ -142,9 +149,9 @@ void ddr_init(void)
 	reg32_write(0x3d400408,0x72ff);
 	reg32_write(0x3d400490,0x1);
 	reg32_write(0x3d400494,0xe00);
-	reg32_write(0x3d400498,0x7ff);
+	reg32_write(0x3d400498,0x62ffff);
 	reg32_write(0x3d40049c,0xe00);
-	reg32_write(0x3d4004a0,0x7ff);
+	reg32_write(0x3d4004a0,0xffff);
 	reg32_write(0x30391000,0x8f000004);
 	reg32_write(0x30391000,0x8f000000);
 	reg32_write(0x3d400030,0xa8);
@@ -195,7 +202,7 @@ void ddr_init(void)
 	reg32_write(DDRC_SWCTL(0), 0x0000);
 	/*
 	 * ------------------- 9 -------------------
-	 * Set DFIMISC.dfi_init_start to 1
+	 * Set DFIMISC.dfi_init_start to 1 
 	 *  -----------------------------------------
 	 */
 	reg32_write(DDRC_DFIMISC(0), 0x00000030);
@@ -237,7 +244,6 @@ void ddr_init(void)
 
 	/* enable port 0 */
 	reg32_write(DDRC_PCTRL_0(0), 0x00000001);
-
 	/* enable DDR auto-refresh mode */
 	tmp = reg32_read(DDRC_RFSHCTL3(0)) & ~0x1;
 	reg32_write(DDRC_RFSHCTL3(0), tmp);
