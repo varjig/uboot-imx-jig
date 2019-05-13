@@ -103,11 +103,8 @@ static int setup_mac(struct var_eeprom *eeprom)
 		return 0;
 
 	ret = var_eeprom_get_mac(eeprom, enetaddr);
-	if (ret)
-		return ret;
-
-	if (!is_valid_ethaddr(enetaddr))
-		return -1;
+	if (ret || !is_valid_ethaddr(enetaddr))
+		net_random_ethaddr(enetaddr);
 
 	return eth_env_set_enetaddr("ethaddr", enetaddr);
 }
