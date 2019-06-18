@@ -146,13 +146,23 @@
 		"fi; " \
 		"bootaux ${m4_addr};\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
-	"mmcargs=setenv bootargs console=${console} root=/dev/sda1 rootfstype=ext4 rootwait rw video=${video}\0 " \
+	"mmcargs=setenv bootargs console=${console} root=/dev/sda1 rootfstype=ext4 rootwait rw video=${video} ${cma_size}\0 " \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
 	"loadimage=load mmc ${mmcdev}:${mmcpart} ${img_addr} ${bootdir}/${image};" \
 		"unzip ${img_addr} ${loadaddr}\0" \
 	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${bootdir}/${fdt_file}\0" \
+	"ramsize_check="\
+		"if test $sdram_size -le 512; then " \
+			"setenv cma_size cma=320MB; " \
+		"else " \
+			"if test $sdram_size -le 1024; then " \
+				"setenv cma_size cma=640MB; " \
+			"else " \
+				"setenv cma_size cma=960MB; " \
+			"fi; " \
+		"fi;\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"run mmcargs; " \
 		"run optargs; " \
@@ -166,9 +176,10 @@
 			"echo wait for boot; " \
 		"fi;\0" \
 	"netargs=setenv bootargs console=${console} " \
-		"root=/dev/nfs video=${video} " \
+		"root=/dev/nfs video=${video} ${cma_size}" \
 		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
+		"run ramsize_check; " \
 		"run netargs;  " \
 		"run optargs; " \
 		"if test ${ip_dyn} = yes; then " \
@@ -194,6 +205,7 @@
 	"splashdisable=setenv splashfile; setenv splashimage\0"
 
 #define CONFIG_BOOTCOMMAND \
+	   "run ramsize_check; " \
 	   "mmc dev ${mmcdev}; if mmc rescan; then " \
 		   "if test ${use_m4} = yes && run loadm4bin; then " \
 			   "run runm4bin; " \
@@ -314,3 +326,7 @@
 #include "imx8m_var_dart_androidthings.h"
 #endif
 #endif
+
+#define CONFIG_CMD_EEPROM
+#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN 1
+#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS 5
