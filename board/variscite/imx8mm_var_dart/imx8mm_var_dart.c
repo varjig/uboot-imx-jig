@@ -37,7 +37,16 @@ int board_postclk_init(void)
 /* Return DRAM size in bytes */
 static unsigned long long get_dram_size(void)
 {
-	return (1ULL * CONFIG_DDR_MB) << 20;
+	int ret;
+	u32 dram_size_mb;
+	struct var_eeprom eeprom;
+
+	var_eeprom_read_header(&eeprom);
+	ret = var_eeprom_get_dram_size(&eeprom, &dram_size_mb);
+	if (ret)
+		return (1ULL * DEFAULT_DRAM_SIZE_MB ) << 20;
+
+	return (1ULL * dram_size_mb) << 20;
 }
 
 int dram_init_banksize(void)
@@ -72,6 +81,21 @@ int ft_board_setup(void *blob, bd_t *bd)
 	return 0;
 }
 #endif
+
+static iomux_v3_cfg_t const onoff_pads[] = {
+	IMX8MM_PAD_ECSPI1_SCLK_GPIO5_IO6 | MUX_PAD_CTRL(NO_PAD_CTRL),
+};
+#define ONOFF_GPIO IMX_GPIO_NR(5, 6)
+
+static void setup_iomux_onoff(void)
+{
+	imx_iomux_v3_setup_multiple_pads(onoff_pads,
+					 ARRAY_SIZE(onoff_pads));
+
+	/* Power-up ethernet PHY */
+	gpio_request(ONOFF_GPIO, "on_off");
+	gpio_direction_output(ONOFF_GPIO, 1);
+}
 
 #ifdef CONFIG_FEC_MXC
 
@@ -116,21 +140,23 @@ static void setup_iomux_fec(void)
 	/* Reset ethernet PHY */
 	gpio_request(FEC_RST_GPIO, "phy_rst");
 	gpio_direction_output(FEC_RST_GPIO, 0);
-	mdelay(10);
-	gpio_direction_output(FEC_RST_GPIO, 1);
+	mdelay(50);
+//	For jig leave this GPIO in LOW state for current measurements.
+//	gpio_direction_output(FEC_RST_GPIO, 1);
 }
 
 static int setup_fec(void)
 {
-	struct iomuxc_gpr_base_regs *const iomuxc_gpr_regs
-		= (struct iomuxc_gpr_base_regs *) IOMUXC_GPR_BASE_ADDR;
+//	struct iomuxc_gpr_base_regs *const iomuxc_gpr_regs
+//		= (struct iomuxc_gpr_base_regs *) IOMUXC_GPR_BASE_ADDR;
 
 	setup_iomux_fec();
 
 	/* Use 125M anatop REF_CLK1 for ENET1, not from external */
-	clrsetbits_le32(&iomuxc_gpr_regs->gpr[1],
-			IOMUXC_GPR_GPR1_GPR_ENET1_TX_CLK_SEL_SHIFT, 0);
-	return set_clk_enet(ENET_125MHZ);
+//	clrsetbits_le32(&iomuxc_gpr_regs->gpr[1],
+//			IOMUXC_GPR_GPR1_GPR_ENET1_TX_CLK_SEL_SHIFT, 0);
+//	return set_clk_enet(ENET_125MHZ);
+	return 0;
 }
 
 #define AR803x_PHY_DEBUG_ADDR_REG	0x1d
@@ -171,6 +197,7 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 
 int board_init(void)
 {
+	setup_iomux_onoff();
 #ifdef CONFIG_FEC_MXC
 	setup_fec();
 #endif

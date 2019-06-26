@@ -22,11 +22,26 @@
 #include <mmc.h>
 #include <asm/arch/imx8m_ddr.h>
 
+#include "../common/imx8m_eeprom.h"
+
 DECLARE_GLOBAL_DATA_PTR;
+
+extern struct dram_timing_info dram_timing, dram_timing_default;
 
 void spl_dram_init(void)
 {
-	ddr_init(&dram_timing);
+	struct var_eeprom eeprom;
+
+	var_eeprom_read_header(&eeprom);
+
+	if (!var_eeprom_is_valid(&eeprom)) {
+		printf("No DRAM info in EEPROM, using defaut DRAM config\n");
+		ddr_init(&dram_timing_default);
+	}
+	else {
+		var_eeprom_adjust_dram(&eeprom, &dram_timing);
+		ddr_init(&dram_timing);
+	}
 }
 
 #define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PE)
@@ -135,9 +150,7 @@ int board_mmc_getcd(struct mmc *mmc)
 		ret = 1;
 		break;
 	case USDHC2_BASE_ADDR:
-		gpio_request(USDHC2_CD_GPIO, "usdhc2 cd");
-		gpio_direction_input(USDHC2_CD_GPIO);
-		ret = !gpio_get_value(USDHC2_CD_GPIO);
+		ret = 1;
 		return ret;
 	}
 

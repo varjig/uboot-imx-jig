@@ -31,10 +31,6 @@
 		regulator-name = "VSD_3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		startup-delay-us = <100>;
-		off-on-delay-us = <12000>;
 	};
 };
 
@@ -94,12 +90,6 @@
 			fsl,pins = <
 				MX8MM_IOMUXC_UART2_RXD_UART2_DCE_RX		0x49
 				MX8MM_IOMUXC_UART2_TXD_UART2_DCE_TX		0x49
-			>;
-		};
-
-		pinctrl_usdhc2_gpio: usdhc2grpgpio {
-			fsl,pins = <
-				MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19		0x41
 			>;
 		};
 
@@ -394,9 +384,9 @@
 
 &usdhc2 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-0 = <&pinctrl_usdhc2>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>;
 	bus-width = <4>;
 	non-removable;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
@@ -430,4 +420,9 @@
 
 &usbotg2 {
 	status = "okay";
+};
+
+
+&snvs_pwrkey{
+	status = "disabled";
 };
