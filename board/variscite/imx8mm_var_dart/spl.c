@@ -31,6 +31,7 @@ extern struct dram_timing_info dram_timing, dram_timing_default;
 void spl_dram_init(void)
 {
 	struct var_eeprom eeprom;
+	volatile int *sdram_test_location=(int*)KERNEL_ADDRESS;
 
 	var_eeprom_read_header(&eeprom);
 
@@ -41,6 +42,19 @@ void spl_dram_init(void)
 	else {
 		var_eeprom_adjust_dram(&eeprom, &dram_timing);
 		ddr_init(&dram_timing);
+		sdram_test_location[0]=0xAAAAAAAA;
+		sdram_test_location[1]=0x55555555;
+		sdram_test_location[2]=0xA5A5A5A5;
+		sdram_test_location[3]=0x5A5A5A5A;
+		if((sdram_test_location[0]!=0xAAAAAAAA) ||
+			(sdram_test_location[1]!=0x55555555) ||
+			(sdram_test_location[2]!=0xA5A5A5A5) ||
+			(sdram_test_location[3]!=0x5A5A5A5A))
+			{
+				printf("LPDDR Test Fail!\n");
+				printf("Using defaut DRAM config\n");
+				ddr_init(&dram_timing_default);
+			}
 	}
 }
 

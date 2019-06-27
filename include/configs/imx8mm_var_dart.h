@@ -23,6 +23,7 @@
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
 #define CONFIG_SYS_UBOOT_BASE		(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
+#define KERNEL_ADDRESS 0x42000000
 
 #ifdef CONFIG_SPL_BUILD
 /*#define CONFIG_ENABLE_DDR_TRAINING_DEBUG*/
@@ -158,7 +159,7 @@
 	"script=boot.scr\0" \
 	"image=Image.gz\0" \
 	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
-	"img_addr=0x42000000\0"			\
+	"img_addr=KERNEL_ADDRESS\0"			\
 	"fdt_addr=0x43000000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
 	"boot_fdt=try\0" \
