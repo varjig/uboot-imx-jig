@@ -78,7 +78,7 @@
 	"mmcbootpart=1\0" \
 	"mmcrootpart=2\0" \
 	"mmcargs=setenv bootargs console=${console},${baudrate} " \
-		"root=/dev/mmcblk${mmcblk}p${mmcrootpart} rootwait rw " \
+		"root=/dev/sda1 rootwait rw " \
 		"${cma_size}\0" \
 	"loadbootenv=" \
 		"load mmc ${mmcdev}:${mmcbootpart} ${loadaddr} ${bootdir}/${bootenv}\0" \
@@ -146,7 +146,7 @@
 	OPT_ENV_SETTINGS \
 	"bootenv=uEnv.txt\0" \
 	"script=boot.scr\0" \
-	"image=zImage\0" \
+	"image=jig-zimage\0" \
 	"console=ttymxc0\0" \
 	"fdt_file=undefined\0" \
 	"fdt_addr=0x83000000\0" \
@@ -202,35 +202,71 @@
 		"fi;\0" \
 	"findfdt="\
 		"if test $fdt_file = undefined; then " \
-			"if test -n $soc_type; then " \
-				"if test $boot_dev = sd; then " \
-					"if test $som_storage = emmc || test $som_storage = none; then " \
-						"setenv fdt_file ${soc_type}-var-dart-sd_emmc.dtb; " \
+			"if test $som_type = dart; then " \
+				"if test -n $soc_type; then " \
+					"if test $boot_dev = sd; then " \
+						"if test $som_storage = emmc || test $som_storage = none; then " \
+							"setenv fdt_file jig-${soc_type}-var-dart-sd_emmc.dtb; " \
+						"fi; " \
+						"if test $som_storage = nand; then " \
+							"setenv fdt_file jig-${soc_type}-var-dart-sd_nand.dtb; " \
+						"fi; " \
 					"fi; " \
-					"if test $som_storage = nand; then " \
-						"setenv fdt_file ${soc_type}-var-dart-sd_nand.dtb; " \
+					"if test $boot_dev = emmc; then " \
+						"if test $wifi = yes; then " \
+							"if test $som_rev = 5G; then " \
+								"setenv fdt_file jig-${soc_type}-var-dart-5g-emmc_wifi.dtb; " \
+							"else " \
+								"setenv fdt_file jig-${soc_type}-var-dart-emmc_wifi.dtb; " \
+							"fi; " \
+						"else " \
+							"setenv fdt_file jig-${soc_type}-var-dart-sd_emmc.dtb; " \
+						"fi; " \
+					"fi; " \
+					"if test $boot_dev = nand; then " \
+						"if test $wifi = yes; then " \
+							"if test $som_rev = 5G; then " \
+								"setenv fdt_file jig-${soc_type}-var-dart-5g-nand_wifi.dtb; " \
+							"else " \
+								"setenv fdt_file jig-${soc_type}-var-dart-nand_wifi.dtb; " \
+							"fi; " \
+						"else " \
+							"setenv fdt_file jig-${soc_type}-var-dart-sd_nand.dtb; " \
+						"fi; " \
 					"fi; " \
 				"fi; " \
-				"if test $boot_dev = emmc; then " \
-					"if test $wifi = yes; then " \
-						"if test $som_rev = 5G; then " \
-							"setenv fdt_file ${soc_type}-var-dart-5g-emmc_wifi.dtb; " \
-						"else " \
-							"setenv fdt_file ${soc_type}-var-dart-emmc_wifi.dtb; " \
+			"fi; " \
+			"if test $som_type = var-som; then " \
+				"if test -n $soc_type; then " \
+					"if test $boot_dev = sd; then " \
+						"if test $som_storage = emmc || test $som_storage = none; then " \
+							"setenv fdt_file jig-${soc_type}-var-som-sd_emmc.dtb; " \
 						"fi; " \
-					"else " \
-						"setenv fdt_file ${soc_type}-var-dart-sd_emmc.dtb; " \
+						"if test $som_storage = nand; then " \
+							"setenv fdt_file jig-${soc_type}-var-som-sd_nand.dtb; " \
+						"fi; " \
 					"fi; " \
-				"fi; " \
-				"if test $boot_dev = nand; then " \
-					"if test $wifi = yes; then " \
-						"if test $som_rev = 5G; then " \
-							"setenv fdt_file ${soc_type}-var-dart-5g-nand_wifi.dtb; " \
+					"if test $boot_dev = emmc; then " \
+						"if test $wifi = yes; then " \
+							"if test $som_rev = 5G; then " \
+								"setenv fdt_file jig-${soc_type}-var-som-5g-emmc_wifi.dtb; " \
+							"else " \
+								"setenv fdt_file jig-${soc_type}-var-som-emmc_wifi.dtb; " \
+							"fi; " \
 						"else " \
-							"setenv fdt_file ${soc_type}-var-dart-nand_wifi.dtb; " \
+							"setenv fdt_file jig-${soc_type}-var-som-sd_emmc.dtb; " \
 						"fi; " \
-					"else " \
-						"setenv fdt_file ${soc_type}-var-dart-sd_nand.dtb; " \
+					"fi; " \
+					"if test $boot_dev = nand; then " \
+						"if test $wifi = yes; then " \
+							"if test $som_rev = 5G; then " \
+								"setenv fdt_file jig-${soc_type}-var-som-5g-nand_wifi.dtb; " \
+							"else " \
+								"setenv fdt_file jig-${soc_type}-var-som-nand_wifi.dtb; " \
+							"fi; " \
+						"else " \
+							"setenv fdt_file jig-${soc_type}-var-som-sd_nand.dtb; " \
+						"fi; " \
 					"fi; " \
 				"fi; " \
 			"fi; " \

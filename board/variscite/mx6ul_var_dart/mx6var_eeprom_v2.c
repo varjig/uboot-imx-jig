@@ -150,6 +150,9 @@ static int handle_commands(const struct eeprom_command commands[],
 			while(!(*reg_ptr & value));
 			break;
 		default:
+			if ((address == 0x021B0020) && (value == 0x00007800))
+				value = 0x00000800;
+
 			/* This is a regular set command (non-wait) */
 			eeprom_v2_debug("Setting data at address %08x to %08x\n", address, value);
 			*reg_ptr = value;
@@ -212,10 +215,7 @@ void var_eeprom_v2_print_production_info(const struct var_eeprom_v2_cfg *p_var_e
 
 void var_eeprom_v2_print_som_info(const struct var_eeprom_v2_cfg *p_var_eeprom_v2_cfg)
 {
-	puts("DART-6UL");
-	if (((p_var_eeprom_v2_cfg->som_info >> 3) & 0x3) == 1)
-		puts("-5G");
-	puts(" configuration: ");
+	puts("SOM configuration: ");
 	switch(p_var_eeprom_v2_cfg->som_info & 0x3) {
 	case 0x00:
 		puts("SD card Only ");
@@ -232,6 +232,8 @@ void var_eeprom_v2_print_som_info(const struct var_eeprom_v2_cfg *p_var_eeprom_v
 	}
 	if (p_var_eeprom_v2_cfg->som_info & 0x04)
 		puts("WiFi");
+	if (((p_var_eeprom_v2_cfg->som_info >> 3) & 0x3) == 1)
+		puts(" (5G)");
 	puts("\n");
 }
 #else
