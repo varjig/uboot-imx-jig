@@ -210,6 +210,7 @@
 	XEN_BOOT_ENV \
 	JAILHOUSE_ENV\
 	AHAB_ENV \
+	"bootdelay=-1\0"	\
 	"bootdir=/boot\0"	\
 	"script=boot.scr\0" \
 	"image=Image.gz\0" \
