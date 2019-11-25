@@ -18,6 +18,12 @@
 #include <asm/mach-imx/sci/sci.h>
 #endif
 
+#ifdef CONFIG_TARGET_IMX8QXP_VAR_SOM
+#define PN_OFFSET	9
+#else
+#define PN_OFFSET	8
+#endif
+
 #include "imx8_eeprom.h"
 
 #ifdef CONFIG_ARCH_IMX8
@@ -159,7 +165,7 @@ static int do_spear_eeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const ar
 	e.dramsize = dram_size / 128;
 	e.somrev = som_revision;
 	e.features = som_features;
-	memcpy(e.partnum, argv[1] + 8, sizeof(e.partnum));
+	memcpy(e.partnum, argv[1] + PN_OFFSET, sizeof(e.partnum));
 	memcpy(e.assembly, argv[2] + 2, sizeof(e.assembly));
 	memcpy(e.date, date, sizeof(e.date));
 	ret = var_eeprom_set_mac(&e, argv[7]);
