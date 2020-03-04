@@ -5,3 +5,8 @@
 #
 
 obj-y += imx8qxp_var_som.o ../common/mmc.o ../common/imx8_eeprom.o
+
+ifdef CONFIG_SPL_BUILD
+obj-y += spl.o
+endif
+
