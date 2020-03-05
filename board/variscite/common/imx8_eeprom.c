@@ -174,10 +174,64 @@ static int do_spear_eeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const ar
 	return 0;
 }
 
+static int do_eeprom_write(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	int ret;
+	uintptr_t addr;
+	uint32_t size;
+
+	if (argc != 3)
+		return CMD_RET_USAGE;
+
+	addr = simple_strtol(argv[1], NULL, 16);
+	size = simple_strtol(argv[2], NULL, 16);
+
+	ret = var_scu_eeprom_write((uint8_t *)addr, size);
+	if (ret) {
+		printf("EEPROM write failed ret=%d\n", ret);
+		return ret;
+	}
+
+	return 0;
+}
+
+static int do_eeprom_read(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	int ret;
+	uintptr_t addr;
+	uint32_t size;
+
+	if (argc != 3)
+		return CMD_RET_USAGE;
+
+	addr = simple_strtol(argv[1], NULL, 16);
+	size = simple_strtol(argv[2], NULL, 16);
+
+	ret = var_scu_eeprom_read((uint8_t *)addr, size);
+	if (ret) {
+		printf("EEPROM write failed ret=%d\n", ret);
+		return ret;
+	}
+
+	return 0;
+}
+
+
 U_BOOT_CMD(spear_eeprom, 11, 1, do_spear_eeprom, "Update SPEAR-MX8 EEPROM",
 		"<part-number> <assembly> <date> <som-conf> <som-rev> <mac>\n"
 		"       - Update SPEAR-MX8 EEPROM"
 )
+
+U_BOOT_CMD(eeprom_write, 11, 1, do_eeprom_write, "Copy data from memory to EEPROM",
+		"<address> <size> \n"
+		"       - Copy data from memory to EEPROM"
+)
+
+U_BOOT_CMD(eeprom_read, 11, 1, do_eeprom_read, "Copy data from EEPROM to memory",
+		"<address> <size> \n"
+		"       - Copy data from EEPROM to memory"
+)
+
 #endif
 
 #ifdef CONFIG_DM_I2C
