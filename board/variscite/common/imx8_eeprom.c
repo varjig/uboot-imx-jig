@@ -18,12 +18,6 @@
 #include <asm/mach-imx/sci/sci.h>
 #endif
 
-#ifdef CONFIG_TARGET_IMX8QXP_VAR_SOM
-#define PN_OFFSET	9
-#else
-#define PN_OFFSET	8
-#endif
-
 #include "imx8_eeprom.h"
 
 #ifdef CONFIG_ARCH_IMX8
@@ -130,12 +124,11 @@ static int do_spear_eeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const ar
 {
 	int ret;
 	char date[10];
-	uint32_t dram_size;
 	uint8_t som_features;
 	uint8_t som_revision;
 	struct var_eeprom e;
 
-	if (argc != 8)
+	if (argc != 7)
 		return CMD_RET_USAGE;
 
 	ret = var_scu_eeprom_read((uint8_t *)&e, sizeof(e));
@@ -148,27 +141,23 @@ static int do_spear_eeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const ar
 	printf("\nPart number: \t\t%s\n", argv[1]);
 	printf("Assembly: \t\t%s\n", argv[2]);
 	printf("Production date: \t%s\n", argv[3]);
-	printf("DRAM size: \t\t%s\n", argv[4]);
-	printf("SOM features: \t\t%s\n", argv[5]);
-	printf("SOM revision: \t\t%s\n", argv[6]);
-	printf("MAC address: \t\t%s\n", argv[7]);
+	printf("SOM features: \t\t%s\n", argv[4]);
+	printf("SOM revision: \t\t%s\n", argv[5]);
+	printf("MAC address: \t\t%s\n", argv[6]);
 
 	memset(date, 0, sizeof(date));
 	remove_spaces(argv[3], date);
 
-	dram_size = (uint32_t)simple_strtoul(argv[4], NULL, 10);
-	som_features = (uint8_t)simple_strtoul(argv[5], NULL, 16);
-	som_revision = (uint8_t)simple_strtoul(argv[6], NULL, 16);
+	som_features = (uint8_t)simple_strtoul(argv[4], NULL, 16);
+	som_revision = (uint8_t)simple_strtoul(argv[5], NULL, 16);
 
-	memset(&e, 0, sizeof(e));
-	e.version = 2;
-	e.dramsize = dram_size / 128;
 	e.somrev = som_revision;
 	e.features = som_features;
-	memcpy(e.partnum, argv[1] + PN_OFFSET, sizeof(e.partnum));
-	memcpy(e.assembly, argv[2] + 2, sizeof(e.assembly));
+	memcpy(e.partnum, argv[1], sizeof(e.partnum));
+	memcpy(e.partnum2, argv[1] + sizeof(e.partnum), sizeof(e.partnum2));
+	memcpy(e.assembly, argv[2], sizeof(e.assembly));
 	memcpy(e.date, date, sizeof(e.date));
-	ret = var_eeprom_set_mac(&e, argv[7]);
+	ret = var_eeprom_set_mac(&e, argv[6]);
 	if (ret)
 		return ret;
 
@@ -186,7 +175,7 @@ static int do_spear_eeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const ar
 }
 
 U_BOOT_CMD(spear_eeprom, 11, 1, do_spear_eeprom, "Update SPEAR-MX8 EEPROM",
-		"<part-number> <assembly> <date> <dram-size> <som-conf> <som-rev> <mac>\n"
+		"<part-number> <assembly> <date> <som-conf> <som-rev> <mac>\n"
 		"       - Update SPEAR-MX8 EEPROM"
 )
 #endif
