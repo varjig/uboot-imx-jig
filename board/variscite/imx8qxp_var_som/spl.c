@@ -32,22 +32,24 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define ESDHC_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
-						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
+#define ESDHC_PAD_CTRL	((SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
+				| (SC_PAD_28FDSOI_DSE_DV_LOW << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
 
 #define ESDHC_CLK_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
-						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PD << PADRING_PULL_SHIFT))
+				| (SC_PAD_28FDSOI_DSE_DV_LOW << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PD << PADRING_PULL_SHIFT))
 
 #define GPIO_PAD_CTRL	((SC_PAD_CONFIG_NORMAL << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
-						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
+				| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
+
 
 #ifdef CONFIG_FSL_ESDHC
 
-#define USDHC1_PWR_GPIO	IMX_GPIO_NR(1, 7)
+#define USDHC1_PWR_GPIO		IMX_GPIO_NR(1, 7)
+#define USDHC1_ROUTE_GPIO	IMX_GPIO_NR(3, 9)
 
 static struct fsl_esdhc_cfg usdhc_cfg[CONFIG_SYS_FSL_USDHC_NUM] = {
 	{USDHC1_BASE_ADDR, 0, 8},
-	{USDHC2_BASE_ADDR, 0, 1},
+	{USDHC2_BASE_ADDR, 0, 4},
 };
 
 static iomux_cfg_t emmc0[] = {
@@ -72,7 +74,8 @@ static iomux_cfg_t usdhc1_sd[] = {
 	SC_P_USDHC1_DATA2 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
 	SC_P_USDHC1_DATA3 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
 	SC_P_SPI0_CS1 | MUX_MODE_ALT(4) | MUX_PAD_CTRL(GPIO_PAD_CTRL),     /* Mux for PWR, GPIO1 IO07 */
-	SC_P_USDHC1_VSELECT | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
+	SC_P_USDHC1_VSELECT | MUX_PAD_CTRL(GPIO_PAD_CTRL),
+	SC_P_QSPI0A_DATA0 | MUX_MODE_ALT(4) | MUX_PAD_CTRL(GPIO_PAD_CTRL),     /* Mux for SDIO Route, GPIO3 IO09 */
 };
 
 void spl_dram_init(void)
@@ -87,7 +90,6 @@ int board_mmc_init(bd_t *bis)
 	sc_ipc_t ipcHndl = 0;
 
 	ipcHndl = gd->arch.ipc_channel_handle;
-
 	/*
 	 * According to the board_mmc_init() the following map is done:
 	 * (U-boot device node)    (Physical Port)
@@ -112,13 +114,21 @@ int board_mmc_init(bd_t *bis)
 			ret = sc_pm_set_resource_power_mode(ipcHndl, SC_R_GPIO_1, SC_PM_PW_MODE_ON);
 			if (ret != SC_ERR_NONE)
 				return ret;
+			ret = sc_pm_set_resource_power_mode(ipcHndl, SC_R_GPIO_3, SC_PM_PW_MODE_ON);
+			if (ret != SC_ERR_NONE)
+				return ret;
+
 			imx8_iomux_setup_multiple_pads(usdhc1_sd, ARRAY_SIZE(usdhc1_sd));
 			init_clk_usdhc(1);
 			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
+
+			gpio_request(USDHC1_ROUTE_GPIO, "sd1_route");
+			gpio_direction_output(USDHC1_ROUTE_GPIO, 0);
+
 			gpio_request(USDHC1_PWR_GPIO, "sd1_pwr");
-                        gpio_direction_output(USDHC1_PWR_GPIO, 0);
-                        mdelay(1000);
-                        gpio_direction_output(USDHC1_PWR_GPIO, 1);
+			gpio_direction_output(USDHC1_PWR_GPIO, 0);
+			mdelay(1000);
+			gpio_direction_output(USDHC1_PWR_GPIO, 1);
 			break;
 
 		default:
