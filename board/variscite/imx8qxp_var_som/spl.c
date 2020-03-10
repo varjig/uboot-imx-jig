@@ -78,11 +78,6 @@ static iomux_cfg_t usdhc1_sd[] = {
 	SC_P_QSPI0A_DATA0 | MUX_MODE_ALT(4) | MUX_PAD_CTRL(GPIO_PAD_CTRL),     /* Mux for SDIO Route, GPIO3 IO09 */
 };
 
-void spl_dram_init(void)
-{
-	/* do nothing */
-}
-
 int board_mmc_init(bd_t *bis)
 {
 
@@ -176,9 +171,6 @@ void spl_board_init(void)
 		}
 	}
 #endif
-	/* DDR initialization */
-	spl_dram_init();
-
 	puts("Normal Boot\n");
 }
 
