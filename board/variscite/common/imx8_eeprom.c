@@ -120,10 +120,26 @@ static void remove_spaces(char *str1, char *str2)
 	}
 }
 
+static char *find_part(const char *fullpartnum)
+{
+	char *first, *second;
+
+	first = strchr(fullpartnum, '-');
+	if (first) {
+		second = strchr(first + 1, '-');
+		if (second)
+			return second + 1;
+	}
+
+	return NULL;
+}
+
 static int do_spear_eeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	int ret;
 	char date[10];
+	char *partnum;
+	int partnum_len;
 	uint8_t som_features;
 	uint8_t som_revision;
 	struct var_eeprom e;
@@ -148,14 +164,31 @@ static int do_spear_eeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const ar
 	memset(date, 0, sizeof(date));
 	remove_spaces(argv[3], date);
 
+	partnum = find_part(argv[1]);
+	partnum_len = strlen(partnum);
+
+	if (!partnum || partnum_len < sizeof(e.partnum)) {
+		printf("Invalid P/N\n");
+		return -1;
+	}
+
+	memcpy(e.partnum, partnum, sizeof(e.partnum));
+
+	if ((partnum_len - sizeof(e.partnum)) < sizeof(e.partnum2))
+		partnum_len = partnum_len - sizeof(e.partnum);
+	else
+		partnum_len = sizeof(e.partnum2);
+
+	memset(e.partnum2, 0, sizeof(e.partnum2));
+	memcpy(e.partnum2, partnum + sizeof(e.partnum), partnum_len);
+
 	som_features = (uint8_t)simple_strtoul(argv[4], NULL, 16);
 	som_revision = (uint8_t)simple_strtoul(argv[5], NULL, 16);
 
 	e.somrev = som_revision;
 	e.features = som_features;
-	memcpy(e.partnum, argv[1], sizeof(e.partnum));
-	memcpy(e.partnum2, argv[1] + sizeof(e.partnum), sizeof(e.partnum2));
-	memcpy(e.assembly, argv[2], sizeof(e.assembly));
+
+	memcpy(e.assembly, argv[2] + 2, sizeof(e.assembly));
 	memcpy(e.date, date, sizeof(e.date));
 	ret = var_eeprom_set_mac(&e, argv[6]);
 	if (ret)
