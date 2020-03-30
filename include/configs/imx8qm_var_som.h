@@ -198,6 +198,7 @@
 	XEN_BOOT_ENV \
 	JAILHOUSE_ENV\
 	AHAB_ENV \
+	"bootdelay=-1\0" \
 	"bootdir=/boot\0" \
 	"script=boot.scr\0" \
 	"image=Image.gz\0" \
@@ -211,14 +212,14 @@
 	"cntr_file=os_cntr_signed.bin\0" \
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \
-	"fdt_file=undefined\0" \
+	"fdt_file=fsl-imx8qm-var-som-hdmi.dtb\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcblk=1\0" \
 	"mmcautodetect=yes\0" \
 	"mmcpart=1\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
 	"mmcargs=setenv bootargs console=${console},${baudrate} earlycon=${earlycon},${baudrate} " \
-		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootfstype=ext4 rootwait rw\0 " \
+		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootfstype=ext4 rootwait rw video=HDMI-A-1:1600x480@60\0 " \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
