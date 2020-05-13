@@ -351,11 +351,14 @@
 #define CONFIG_NR_DRAM_BANKS				4
 #define PHYS_SDRAM_1					0x80000000
 #define PHYS_SDRAM_2					0x880000000
-#define PHYS_SDRAM_1_SIZE				0x80000000	/* 2 GB */
-#define PHYS_SDRAM_2_SIZE				0x80000000	/* 2 GB */
+
+/* This value is JIG specific and should not be changed to match Yocto value.
+ * It is intended to support all possible RAM sizes when EEPROM is not programmed yet.
+ */
+#define DEFAULT_DRAM_SIZE_MB				2048
 
 #define CONFIG_SYS_MEMTEST_START			0xA0000000
-#define CONFIG_SYS_MEMTEST_END				(CONFIG_SYS_MEMTEST_START + (PHYS_SDRAM_1_SIZE >> 2))
+#define CONFIG_SYS_MEMTEST_END				(CONFIG_SYS_MEMTEST_START + ((DEFAULT_DRAM_SIZE_MB * 1024) >> 2))
 
 /* Serial */
 #define CONFIG_BAUDRATE					115200

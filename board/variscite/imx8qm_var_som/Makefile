@@ -1,9 +1,13 @@
 #
 # Copyright 2017 NXP
-# Copyright 2019 Variscite Ltd.
+# Copyright 2019-2020 Variscite Ltd.
 #
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-obj-y += imx8qm_var_som.o ../common/mmc.o ../common/imx8_eeprom.o
+obj-y += imx8qm_var_som.o ../common/mmc.o ../common/imx8_eeprom.o ../common/imx8_dram.o
+
+ifdef CONFIG_SPL_BUILD
+obj-y += spl.o
+endif
 
