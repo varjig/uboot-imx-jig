@@ -74,6 +74,197 @@ int var_scu_eeprom_read_header(struct var_eeprom *e)
 
 	return 0;
 }
+
+static int var_scu_eeprom_write(uint8_t *buf, uint32_t size)
+{
+	uint32_t command;
+	sc_ipc_t ipc_handle = gd->arch.ipc_channel_handle;
+
+	command = SOMINFO_WRITE_EEPROM;
+
+	flush_dcache_all();
+	invalidate_icache_all();
+
+	return sc_misc_board_ioctl(ipc_handle, &command, (uint32_t *)&buf, &size);
+}
+
+#define CHAR_BIT 8
+
+static int var_eeprom_set_mac(struct var_eeprom *e, char *value)
+{
+	int8_t i;
+	uint64_t mac;
+	char *endptr;
+	uint8_t *p = e->mac;
+
+	mac = simple_strtoul(value, &endptr, 16);
+	if ((endptr == value) || (*endptr != '\0')) {
+		printf("Invalid MAC\n");
+		return -1;
+	}
+
+	for (i = 5; i >= 0; i--) {
+		*p++ = mac >> (CHAR_BIT * i);
+	}
+
+	return 0;
+}
+
+static void remove_spaces(char *str1, char *str2)
+{
+	while (*str1) {
+		if (*str1 == ' ')
+			str1++;
+		else
+			*str2++ = *str1++;
+	}
+}
+
+static char *find_part(const char *fullpartnum)
+{
+	char *first, *second;
+
+	first = strchr(fullpartnum, '-');
+	if (first) {
+		second = strchr(first + 1, '-');
+		if (second)
+			return second + 1;
+	}
+
+	return NULL;
+}
+
+static int do_spear_eeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	int ret;
+	char date[10];
+	char *partnum;
+	int partnum_len;
+	uint8_t som_features;
+	uint8_t som_revision;
+	struct var_eeprom e;
+
+	if (argc != 7)
+		return CMD_RET_USAGE;
+
+	ret = var_scu_eeprom_read((uint8_t *)&e, sizeof(e));
+	if (ret) {
+		printf("EEPROM read failed ret=%d\n", ret);
+		return ret;
+	}
+
+	printf("\nThe following data will be written to EEPROM:\n");
+	printf("\nPart number: \t\t%s\n", argv[1]);
+	printf("Assembly: \t\t%s\n", argv[2]);
+	printf("Production date: \t%s\n", argv[3]);
+	printf("SOM features: \t\t%s\n", argv[4]);
+	printf("SOM revision: \t\t%s\n", argv[5]);
+	printf("MAC address: \t\t%s\n", argv[6]);
+
+	memset(date, 0, sizeof(date));
+	remove_spaces(argv[3], date);
+
+	partnum = find_part(argv[1]);
+	partnum_len = strlen(partnum);
+
+	if (!partnum || partnum_len < sizeof(e.partnum)) {
+		printf("Invalid P/N\n");
+		return -1;
+	}
+
+	memcpy(e.partnum, partnum, sizeof(e.partnum));
+
+	if ((partnum_len - sizeof(e.partnum)) < sizeof(e.partnum2))
+		partnum_len = partnum_len - sizeof(e.partnum);
+	else
+		partnum_len = sizeof(e.partnum2);
+
+	memset(e.partnum2, 0, sizeof(e.partnum2));
+	memcpy(e.partnum2, partnum + sizeof(e.partnum), partnum_len);
+
+	som_features = (uint8_t)simple_strtoul(argv[4], NULL, 16);
+	som_revision = (uint8_t)simple_strtoul(argv[5], NULL, 16);
+
+	e.somrev = som_revision;
+	e.features = som_features;
+
+	memcpy(e.assembly, argv[2] + 2, sizeof(e.assembly));
+	memcpy(e.date, date, sizeof(e.date));
+	ret = var_eeprom_set_mac(&e, argv[6]);
+	if (ret)
+		return ret;
+
+	e.magic = swab16(VAR_EEPROM_MAGIC);
+
+	ret = var_scu_eeprom_write((uint8_t *)&e, sizeof(e));
+	if (ret) {
+		printf("EEPROM write failed ret=%d\n", ret);
+		return ret;
+	}
+
+	printf("\nEEPROM updated successfully\n");
+
+	return 0;
+}
+
+static int do_eeprom_write(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	int ret;
+	uintptr_t addr;
+	uint32_t size;
+
+	if (argc != 3)
+		return CMD_RET_USAGE;
+
+	addr = simple_strtol(argv[1], NULL, 16);
+	size = simple_strtol(argv[2], NULL, 16);
+
+	ret = var_scu_eeprom_write((uint8_t *)addr, size);
+	if (ret) {
+		printf("EEPROM write failed ret=%d\n", ret);
+		return ret;
+	}
+
+	return 0;
+}
+
+static int do_eeprom_read(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	int ret;
+	uintptr_t addr;
+	uint32_t size;
+
+	if (argc != 3)
+		return CMD_RET_USAGE;
+
+	addr = simple_strtol(argv[1], NULL, 16);
+	size = simple_strtol(argv[2], NULL, 16);
+
+	ret = var_scu_eeprom_read((uint8_t *)addr, size);
+	if (ret) {
+		printf("EEPROM write failed ret=%d\n", ret);
+		return ret;
+	}
+
+	return 0;
+}
+
+
+U_BOOT_CMD(spear_eeprom, 11, 1, do_spear_eeprom, "Update SPEAR-MX8 EEPROM",
+		"<part-number> <assembly> <date> <som-conf> <som-rev> <mac>\n"
+		"       - Update SPEAR-MX8 EEPROM"
+)
+
+U_BOOT_CMD(eeprom_write, 11, 1, do_eeprom_write, "Copy data from memory to EEPROM",
+		"<address> <size> \n"
+		"       - Copy data from memory to EEPROM"
+)
+
+U_BOOT_CMD(eeprom_read, 11, 1, do_eeprom_read, "Copy data from EEPROM to memory",
+		"<address> <size> \n"
+		"       - Copy data from EEPROM to memory"
+)
+
 #endif
 
 #ifdef CONFIG_DM_I2C
@@ -239,6 +430,8 @@ void var_eeprom_print_prod_info(struct var_eeprom *e)
 
 	debug("EEPROM version: 0x%x\n", e->version);
 	debug("SOM features: 0x%x\n", e->features);
+	debug("SOM revision: 0x%x\n", e->somrev);
+
 	if (e->version == 1)
 		debug("DRAM size: %d GiB\n\n", e->dramsize);
 	else
