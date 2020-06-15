@@ -180,8 +180,8 @@
 		"usb start;" \
 		"run mmcargs;" \
 		"usb start;" \
-		"load usb 0:2 ${fdt_addr} ${bootdir}/${fdt_file};" \
-		"load usb 0:2 ${img_addr} ${bootdir}/${image};" \
+		"load usb 0:1 ${fdt_addr} ${bootdir}/${fdt_file};" \
+		"load usb 0:1 ${img_addr} ${bootdir}/${image};" \
 		"unzip ${img_addr} ${loadaddr};" \
 		"booti ${loadaddr} - ${fdt_addr};\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} earlycon " \
@@ -223,24 +223,7 @@
 		"setenv splashimage 0x83100000\0" \
 	"splashdisable=setenv splashfile; setenv splashimage\0"
 
-#define CONFIG_BOOTCOMMAND \
-	   "mmc dev ${mmcdev}; if mmc rescan; then " \
-		   "if run loadbootscript; then " \
-			   "run bootscript; " \
-		   "else " \
-			   "if test ${sec_boot} = yes; then " \
-				   "if run loadcntr; then " \
-					   "run mmcboot; " \
-				   "else run netboot; " \
-				   "fi; " \
-			    "else " \
-				   "if run loadimage; then " \
-					   "run mmcboot; " \
-				   "else run netboot; " \
-				   "fi; " \
-			 "fi; " \
-		   "fi; " \
-	   "else booti ${loadaddr} - ${fdt_addr}; fi"
+#define CONFIG_BOOTCOMMAND "run mmcboot; "
 
 /* Link Definitions */
 #define CONFIG_LOADADDR			0x80280000
