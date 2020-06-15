@@ -146,6 +146,7 @@
 	CONFIG_MFG_ENV_SETTINGS \
 	M4_BOOT_ENV \
 	AHAB_ENV \
+	"bootdelay=-1\0"	\
 	"bootdir=/boot\0"	\
 	"script=boot.scr\0" \
 	"image=Image.gz\0" \
@@ -158,14 +159,14 @@
 	"cntr_file=os_cntr_signed.bin\0" \
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \
-	"fdt_file=fsl-imx8qxp-var-som.dtb\0" \
+	"fdt_file=fsl-imx8qxp-var-som-wifi.dtb\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcblk=1\0" \
 	"mmcautodetect=yes\0" \
 	"mmcpart=1\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
 	"mmcargs=setenv bootargs console=${console},${baudrate} earlycon " \
-		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootfstype=ext4 rootwait rw\0 " \
+	"root=/dev/sda1 rootfstype=ext4 rootwait rw;\0" \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
@@ -175,26 +176,14 @@
 	"loadcntr=load mmc ${mmcdev}:${mmcpart} ${cntr_addr} ${bootdir}/${cntr_file}\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
 	"boot_os=booti ${loadaddr} - ${fdt_addr};\0" \
-	"mmcboot=echo Booting from mmc ...; " \
-		"run mmcargs; " \
-		"run optargs; " \
-		"if test ${sec_boot} = yes; then " \
-			"if run auth_os; then " \
-				"run boot_os; " \
-			"else " \
-				"echo ERR: failed to authenticate; " \
-			"fi; " \
-		"else " \
-			"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-				"if run loadfdt; then " \
-					"run boot_os; " \
-				"else " \
-					"echo WARN: Cannot load the DT; " \
-				"fi; " \
-			"else " \
-				"echo wait for boot; " \
-			"fi;" \
-		"fi;\0" \
+	"mmcboot=echo Booting from USB;" \
+		"usb start;" \
+		"run mmcargs;" \
+		"usb start;" \
+		"load usb 0:2 ${fdt_addr} ${bootdir}/${fdt_file};" \
+		"load usb 0:2 ${img_addr} ${bootdir}/${image};" \
+		"unzip ${img_addr} ${loadaddr};" \
+		"booti ${loadaddr} - ${fdt_addr};\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} earlycon " \
 		"root=/dev/nfs " \
 		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
@@ -276,7 +265,11 @@
 #define CONFIG_NR_DRAM_BANKS		4
 #define PHYS_SDRAM_1			0x80000000
 #define PHYS_SDRAM_2			0x880000000
-#define DEFAULT_DRAM_SIZE_MB		2048
+
+/* This value is JIG specific and should not be changed to match Yocto value.
+ * It is intended to support all possible RAM sizes when EEPROM is not programmed yet.
+ */
+#define DEFAULT_DRAM_SIZE_MB		512
 
 #define CONFIG_SYS_MEMTEST_START	0xA0000000
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + ((DEFAULT_DRAM_SIZE_MB * 1024) >> 2))
