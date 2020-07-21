@@ -37,6 +37,7 @@ static int var_scu_eeprom_read(uint8_t *buf, uint32_t size)
 	uint32_t command;
 	sc_err_t ret = 0;
 	sc_ipc_t ipc_handle;
+	int i;
 
 	/* Open IPC channel */
 	ret = sc_ipc_open(&ipc_handle, SC_IPC_CH);
@@ -58,6 +59,16 @@ static int var_scu_eeprom_read(uint8_t *buf, uint32_t size)
 
 	flush_dcache_all();
 	invalidate_icache_all();
+
+	for(i=2;i<size;i++)
+		if(buf[i]!=0)
+			break;
+	if((buf[0]!=0) && (buf[1]!=0) && (i==size))
+	{
+		printf("ERROR!! EEPROM DATA CANNOT BE ZEROs!!!\n");
+		buf[0]=0;
+		buf[1]=0;
+	}
 
 	return ret;
 }
