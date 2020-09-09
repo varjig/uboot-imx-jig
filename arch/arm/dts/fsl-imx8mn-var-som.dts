@@ -469,7 +469,7 @@
 	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
 	bus-width = <4>;
-	cd-gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
+	non-removable;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
 };

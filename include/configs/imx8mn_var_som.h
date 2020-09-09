@@ -114,6 +114,7 @@
 	"img_addr=0x42000000\0" \
 	"console=ttymxc3,115200 earlycon=ec_imx6q,0x30a60000,115200\0" \
 	"fdt_addr=0x43000000\0" \
+	"bootdelay=-1\0" \
 	"fdt_high=0xffffffffffffffff\0" \
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \

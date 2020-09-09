@@ -23,13 +23,6 @@
 
 &iomuxc {
 	imx8mm-var-som {
-		pinctrl_usdhc2_gpio: usdhc2grpgpio {
-			fsl,pins = <
-				MX8MM_IOMUXC_SAI2_RXC_GPIO4_IO22	0x41
-				MX8MM_IOMUXC_SD2_CD_B_GPIO2_IO12	0xc1
-			>;
-		};
-
 		pinctrl_typec: typecgrp {
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO10_GPIO1_IO10	0x16
@@ -54,6 +47,3 @@
 	extcon = <0>, <&typec_ptn5150>;
 };
 
-&usdhc2 {
-	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
-};

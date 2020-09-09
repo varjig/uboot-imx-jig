@@ -84,17 +84,37 @@ static int get_som_rev(void)
 	return som_rev;
 }
 
+extern struct dram_timing_info dram_timing_default;
 void spl_dram_init(void)
 {
 	int id;
 	struct var_eeprom eeprom = {0};
+	volatile int *sdram_test_location=(int*)0x42000000;
 
 	id = get_board_id();
 
 	if (id == DART_MX8M_MINI) {
 		var_eeprom_read_header(&eeprom);
+		if (!var_eeprom_is_valid(&eeprom)) {
+			printf("No DRAM info in EEPROM, using defaut DRAM config\n");
+			ddr_init(&dram_timing_default);
+		}
+		else {
 		var_eeprom_adjust_dram(&eeprom, &dram_timing_lpddr4);
 		ddr_init(&dram_timing_lpddr4);
+			sdram_test_location[0]=0xAAAAAAAA;
+			sdram_test_location[1]=0x55555555;
+			sdram_test_location[2]=0xA5A5A5A5;
+			sdram_test_location[3]=0x5A5A5A5A;
+			if((sdram_test_location[0]!=0xAAAAAAAA) ||
+				(sdram_test_location[1]!=0x55555555) ||
+				(sdram_test_location[2]!=0xA5A5A5A5) ||
+				(sdram_test_location[3]!=0x5A5A5A5A)) {
+					printf("LPDDR Test Fail!\n");
+					printf("Using defaut DRAM config\n");
+					ddr_init_lpddr4(&dram_timing_default);
+			}
+		}
 	}
 	else if (id == VAR_SOM_MX8M_MINI) {
 		var_eeprom_read_header(&eeprom);
@@ -107,12 +127,8 @@ void spl_dram_init(void)
 	}
 }
 
-#define USDHC2_PWR_GPIO_DART	IMX_GPIO_NR(2, 19)
-#define USDHC2_PWR_GPIO_SOM	IMX_GPIO_NR(4, 22)
-
 #define USDHC_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE |PAD_CTL_PE | \
 			 PAD_CTL_FSEL2)
-#define USDHC_GPIO_PAD_CTRL (PAD_CTL_HYS | PAD_CTL_DSE1)
 
 static iomux_v3_cfg_t const usdhc3_pads[] = {
 	IMX8MM_PAD_NAND_WE_B_USDHC3_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -134,14 +150,6 @@ static iomux_v3_cfg_t const usdhc2_pads[] = {
 	IMX8MM_PAD_SD2_DATA1_USDHC2_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MM_PAD_SD2_DATA2_USDHC2_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MM_PAD_SD2_DATA3_USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
-};
-
-static iomux_v3_cfg_t const usdhc2_pwr_pads_dart[] = {
-	IMX8MM_PAD_SD2_RESET_B_GPIO2_IO19 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
-};
-
-static iomux_v3_cfg_t const usdhc2_pwr_pads_som[] = {
-	IMX8MM_PAD_SAI2_RXC_GPIO4_IO22 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
 
 static struct fsl_esdhc_cfg usdhc_cfg[2] = {
@@ -166,21 +174,6 @@ int board_mmc_init(bd_t *bis)
 			usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
 			imx_iomux_v3_setup_multiple_pads(usdhc2_pads,
 						ARRAY_SIZE(usdhc2_pads));
-			if (get_board_id() == VAR_SOM_MX8M_MINI) {
-				imx_iomux_v3_setup_multiple_pads(usdhc2_pwr_pads_som,
-						ARRAY_SIZE(usdhc2_pwr_pads_som));
-				gpio_request(USDHC2_PWR_GPIO_SOM, "usdhc2_reset");
-				gpio_direction_output(USDHC2_PWR_GPIO_SOM, 0);
-				udelay(500);
-				gpio_direction_output(USDHC2_PWR_GPIO_SOM, 1);
-			} else {
-				imx_iomux_v3_setup_multiple_pads(usdhc2_pwr_pads_dart,
-						ARRAY_SIZE(usdhc2_pwr_pads_dart));
-				gpio_request(USDHC2_PWR_GPIO_DART, "usdhc2_reset");
-				gpio_direction_output(USDHC2_PWR_GPIO_DART, 0);
-				udelay(500);
-				gpio_direction_output(USDHC2_PWR_GPIO_DART, 1);
-			}
 			break;
 		case 1:
 			init_clk_usdhc(2);
@@ -204,18 +197,6 @@ int board_mmc_init(bd_t *bis)
 
 int board_mmc_getcd(struct mmc *mmc)
 {
-	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
-	int ret = 0;
-
-	switch (cfg->esdhc_base) {
-	case USDHC3_BASE_ADDR:
-		ret = 1;
-		break;
-	case USDHC2_BASE_ADDR:
-		ret = 1;
-		return ret;
-	}
-
 	return 1;
 }
 
