@@ -112,7 +112,7 @@ void spl_dram_init(void)
 				(sdram_test_location[3]!=0x5A5A5A5A)) {
 					printf("LPDDR Test Fail!\n");
 					printf("Using defaut DRAM config\n");
-					ddr_init_lpddr4(&dram_timing_default);
+					ddr_init(&dram_timing_default);
 			}
 		}
 	}
