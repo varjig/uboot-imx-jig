@@ -89,6 +89,20 @@ static iomux_v3_cfg_t const wdog_pads[] = {
 	IMX8MM_PAD_GPIO1_IO02_WDOG1_WDOG_B  | MUX_PAD_CTRL(WDOG_PAD_CTRL),
 };
 
+static iomux_v3_cfg_t const onoff_pads[] = {
+	IMX8MM_PAD_ECSPI1_SCLK_GPIO5_IO6 | MUX_PAD_CTRL(NO_PAD_CTRL),
+};
+#define ONOFF_GPIO IMX_GPIO_NR(5, 6)
+
+static void setup_iomux_onoff(void)
+{
+	imx_iomux_v3_setup_multiple_pads(onoff_pads,ARRAY_SIZE(onoff_pads));
+
+	/*Pull up GPIO5_IO1. This will disable JIG power off */
+	gpio_request(ONOFF_GPIO, "on_off");
+	gpio_direction_output(ONOFF_GPIO, 1);
+}
+
 extern struct mxc_uart *mxc_base;
 
 int board_early_init_f(void)
@@ -227,6 +241,7 @@ static void setup_usb(void)
 
 int board_init(void)
 {
+	setup_iomux_onoff();
 #ifdef CONFIG_FEC_MXC
 	setup_fec();
 #endif
