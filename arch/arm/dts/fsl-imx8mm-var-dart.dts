@@ -503,3 +503,8 @@
 &gpio5 {
 	u-boot,dm-pre-reloc;
 };
+
+&snvs_pwrkey{
+        status = "disabled";
+};
+
