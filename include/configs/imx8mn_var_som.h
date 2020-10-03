@@ -124,7 +124,7 @@
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcblk=1\0" \
 	"mmcautodetect=yes\0" \
-	"mmcpart=1\0" \
+	"mmcpart=2\0" \
 	"m7_addr=0x7e0000\0" \
 	"m7_bin=hello_world.bin\0" \
 	"use_m7=no\0" \
@@ -140,7 +140,7 @@
 		"bootaux ${m7_addr};\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
 	"mmcargs=setenv bootargs console=${console} " \
-		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait rw ${cma_size}\0 " \
+		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait rw cma=64M\0 " \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
