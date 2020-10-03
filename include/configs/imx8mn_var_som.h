@@ -140,7 +140,7 @@
 		"bootaux ${m7_addr};\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
 	"mmcargs=setenv bootargs console=${console} " \
-		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait rw cma=64M\0 " \
+		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait rw cma=256M\0 " \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
