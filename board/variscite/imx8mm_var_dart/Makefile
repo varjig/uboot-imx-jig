@@ -9,7 +9,7 @@ obj-y += ../common/imx8_eeprom.o
 
 ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
-obj-$(CONFIG_IMX8M_LPDDR4) += lpddr4_timing.o lpddr4_timing_default.o lpddr4_timing_8mm_4G_Micron_IT_V14.o
+obj-$(CONFIG_IMX8M_LPDDR4) += lpddr4_timing.o lpddr4_timing_default.o
 obj-$(CONFIG_IMX8M_DDR4) += ddr4_timing.o 
 else
 obj-y += imx8mm_var_dart.o ../common/mmc.o
