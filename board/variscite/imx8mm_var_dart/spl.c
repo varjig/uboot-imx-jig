@@ -85,6 +85,8 @@ static int get_som_rev(void)
 }
 
 extern struct dram_timing_info dram_timing_default;
+extern struct dram_timing_info dram_timing_default_4G_IT;
+
 void spl_dram_init(void)
 {
 	int id;
@@ -96,12 +98,24 @@ void spl_dram_init(void)
 	if (id == DART_MX8M_MINI) {
 		var_eeprom_read_header(&eeprom);
 		if (!var_eeprom_is_valid(&eeprom)) {
-			printf("No DRAM info in EEPROM, using defaut DRAM config\n");
-			ddr_init(&dram_timing_default);
+			printf("No DRAM info in EEPROM, Trying 4GB IT default DRAM config\n");
+			ddr_init(&dram_timing_default_4G_IT);
+			sdram_test_location[0]=0xAAAAAAAA;
+			sdram_test_location[1]=0x55555555;
+			sdram_test_location[2]=0xA5A5A5A5;
+			sdram_test_location[3]=0x5A5A5A5A;
+			if((sdram_test_location[0]!=0xAAAAAAAA) ||
+				(sdram_test_location[1]!=0x55555555) ||
+				(sdram_test_location[2]!=0xA5A5A5A5) ||
+				(sdram_test_location[3]!=0x5A5A5A5A)) {
+					printf("LPDDR 4GB IT not found trying 512MB default!\n");
+					printf("Using defaut DRAM config\n");
+					ddr_init(&dram_timing_default);
+			}
 		}
 		else {
-		var_eeprom_adjust_dram(&eeprom, &dram_timing_lpddr4);
-		ddr_init(&dram_timing_lpddr4);
+			var_eeprom_adjust_dram(&eeprom, &dram_timing_lpddr4);
+			ddr_init(&dram_timing_lpddr4);
 			sdram_test_location[0]=0xAAAAAAAA;
 			sdram_test_location[1]=0x55555555;
 			sdram_test_location[2]=0xA5A5A5A5;
