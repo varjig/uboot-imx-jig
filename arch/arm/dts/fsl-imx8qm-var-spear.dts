@@ -61,7 +61,6 @@
 			regulator-name = "sw-3p3-sd1";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
-			gpio = <&gpio4 7 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 		};
 	};
@@ -243,7 +242,7 @@
 	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
 	bus-width = <4>;
-	cd-gpios = <&gpio5 22 GPIO_ACTIVE_LOW>;
+	non-removable;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
 };
