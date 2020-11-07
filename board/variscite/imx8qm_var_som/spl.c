@@ -183,9 +183,11 @@ int board_mmc_getcd(struct mmc *mmc)
 }
 
 #endif /* CONFIG_FSL_ESDHC */
+extern int var_scu_eeprom_write(uint8_t *buf, uint32_t size);
 
 void spl_board_init(void)
 {
+	char input[512];
 #if defined(CONFIG_SPL_SPI_SUPPORT)
 	sc_ipc_t ipcHndl = 0;
 
@@ -198,6 +200,15 @@ void spl_board_init(void)
 #endif
 
 	puts("Normal Boot\n");
+	puts("Do you want to erase EEPROM?[Y/N]\n");
+	mdelay(2000);
+	if(tstc()!=0)
+		if(getc()=='Y')
+		{
+			printf("Erasing EEPROM\n");
+			memset(input,0x00,512);
+			var_scu_eeprom_write((uint8_t *)input,512);
+		}
 }
 
 void spl_board_prepare_for_boot(void)
