@@ -216,7 +216,7 @@
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcblk=1\0" \
 	"mmcautodetect=yes\0" \
-	"mmcpart=1\0" \
+	"mmcpart=2\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
 	"mmcargs=setenv bootargs console=${console},${baudrate} earlycon=${earlycon},${baudrate} " \
 		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootfstype=ext4 rootwait rw video=HDMI-A-1:1600x480@60\0 " \
