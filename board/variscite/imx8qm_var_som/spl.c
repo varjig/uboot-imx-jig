@@ -201,12 +201,12 @@ void spl_board_init(void)
 
 	puts("Normal Boot\n");
 	puts("Do you want to erase EEPROM?[Y/N]\n");
-	mdelay(2000);
+	mdelay(1000);
 	if(tstc()!=0)
 		if(getc()=='Y')
 		{
 			printf("Erasing EEPROM\n");
-			memset(input,0x00,512);
+			memset(input,0xFF,512);
 			var_scu_eeprom_write((uint8_t *)input,512);
 		}
 }
