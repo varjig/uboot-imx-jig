@@ -86,7 +86,7 @@ int var_scu_eeprom_read_header(struct var_eeprom *e)
 	return 0;
 }
 
-static int var_scu_eeprom_write(uint8_t *buf, uint32_t size)
+int var_scu_eeprom_write(uint8_t *buf, uint32_t size)
 {
 	uint32_t command;
 	sc_ipc_t ipc_handle = gd->arch.ipc_channel_handle;
