@@ -69,6 +69,7 @@
 /* Initial environment variables */
 #define CONFIG_EXTRA_ENV_SETTINGS		\
 	CONFIG_MFG_ENV_SETTINGS \
+	"bootdelay=-1\0"			\
 	"bootdir=/boot\0"	\
 	"script=boot.scr\0" \
 	"image=Image.gz\0" \
@@ -97,13 +98,9 @@
 	"findfdt=" \
 		"if test $fdt_file = undefined; then " \
 			"if test $board_name = VAR-SOM-MX8M-PLUS; then " \
-				"setenv fdt_file imx8mp-var-som-symphony.dtb; " \
+				"setenv fdt_file imx8mp-var-som-jig.dtb; " \
 			"else " \
-				"if test $dart_carrier_rev = legacy; then " \
-					"setenv fdt_file imx8mp-var-dart-dt8mcustomboard-legacy.dtb;" \
-				"else " \
-					"setenv fdt_file imx8mp-var-dart-dt8mcustomboard.dtb;" \
-				"fi; " \
+				"setenv fdt_file imx8mp-var-dart-jig.dtb; " \
 			"fi; " \
 		"fi; \0" \
 	"loadfdt=run findfdt; " \

@@ -97,6 +97,7 @@ struct i2c_pads_info i2c_pads_som = {
 
 #define USDHC2_RST_GPIO_DART IMX_GPIO_NR(2, 19)
 #define USDHC2_RST_GPIO_SOM  IMX_GPIO_NR(4, 22)
+#define JIG_ONOFF_GPIO_DART  IMX_GPIO_NR(5, 6)
 
 #define USDHC_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE |PAD_CTL_PE | \
 			 PAD_CTL_FSEL2)
@@ -122,6 +123,10 @@ static iomux_v3_cfg_t const usdhc2_pads[] = {
 	MX8MP_PAD_SD2_DATA1__USDHC2_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX8MP_PAD_SD2_DATA2__USDHC2_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX8MP_PAD_SD2_DATA3__USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+};
+
+static iomux_v3_cfg_t const jig_onoff_pads_dart[] = {
+	MX8MP_PAD_ECSPI1_SCLK__GPIO5_IO06 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
 
 static iomux_v3_cfg_t const usdhc2_rst_pads_dart[] = {
@@ -264,6 +269,15 @@ void spl_board_init(void)
 
 	puts("Normal Boot\n");
 
+	puts("Normal Boot\n");
+	puts("Do you want to erase EEPROM?[Y/N]\n");
+	mdelay(1000);
+	if(tstc()!=0)
+		if(getc()=='Y')
+		{
+			printf("Erasing EEPROM\n");
+			memset(&eeprom,0xFF,sizeof(*ep));
+		}
 	/* Copy EEPROM contents to DRAM */
 	memcpy(ep, &eeprom, sizeof(*ep));
 }
@@ -273,17 +287,9 @@ int board_fit_config_name_match(const char *name)
 {
 	int id = var_detect_board_id();
 
-	if (id == BOARD_ID_DART) {
-		int carrier_rev = var_detect_dart_carrier_rev();
-
-		if ((carrier_rev == DART_CARRIER_REV_1) &&
-			!strcmp(name, "imx8mp-var-dart-dt8mcustomboard-legacy"))
-			return 0;
-		else if ((carrier_rev == DART_CARRIER_REV_2) &&
-			!strcmp(name, "imx8mp-var-dart-dt8mcustomboard"))
-			return 0;
-	}
-	else if ((id == BOARD_ID_SOM) && !strcmp(name, "imx8mp-var-som-symphony"))
+	if ((id == BOARD_ID_DART) && !strcmp(name, "imx8mp-var-dart-jig"))
+		return 0;
+	else if ((id == BOARD_ID_SOM) && !strcmp(name, "imx8mp-var-som-jig"))
 		return 0;
 
 	return -1;
@@ -293,6 +299,7 @@ int board_fit_config_name_match(const char *name)
 void board_init_f(ulong dummy)
 {
 	int ret, board_id;
+	int jig_onoff_gpio;
 
 	/* Clear the BSS. */
 	memset(__bss_start, 0, __bss_end - __bss_start);
@@ -317,7 +324,13 @@ void board_init_f(ulong dummy)
 
 	/* I2C Bus 0 initialization */
 	if (board_id == BOARD_ID_DART)
+	{
 		setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pads_dart);
+		jig_onoff_gpio = JIG_ONOFF_GPIO_DART;
+		imx_iomux_v3_setup_multiple_pads(jig_onoff_pads_dart,ARRAY_SIZE(jig_onoff_pads_dart));
+		gpio_request(jig_onoff_gpio, "onoff-pair-gpio");
+		gpio_direction_output(jig_onoff_gpio, 1);
+	}
 	else
 		setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pads_som);
 
@@ -326,6 +339,7 @@ void board_init_f(ulong dummy)
 
 	/* DDR initialization */
 	spl_dram_init();
+
 
 	board_init_r(NULL, 0);
 }
