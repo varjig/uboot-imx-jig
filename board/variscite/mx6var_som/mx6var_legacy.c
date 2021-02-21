@@ -658,6 +658,58 @@ static void spl_dram_init_mx6solo_1gb(void)
 	mmdc_p0->mdscr          = (u32)0x00000000;
 }
 
+static void spl_dram_init_vsm_dual_2gb(void)
+{
+	volatile struct mmdc_p_regs *mmdc_p0;
+	mmdc_p0 = (struct mmdc_p_regs *) MMDC_P0_BASE_ADDR;
+
+	/* ZQ */
+	mmdc_p0->mpzqhwctrl     = (u32)0xA1390003;
+	/* Write leveling */
+	mmdc_p0->mpwldectrl0    = (u32)0x00430043;
+	mmdc_p0->mpwldectrl1    = (u32)0x0043003F;
+
+	mmdc_p0->mpdgctrl0      = (u32)0x03480358;
+	mmdc_p0->mpdgctrl1      = (u32)0x03500340;
+
+	mmdc_p0->mprddlctl      = (u32)0x3E38343A;
+
+	mmdc_p0->mpwrdlctl      = (u32)0x343A403A;
+	/* Read data bit delay */
+	mmdc_p0->mprddqby0dl    = (u32)0x33333333;
+	mmdc_p0->mprddqby1dl    = (u32)0x33333333;
+	mmdc_p0->mprddqby2dl    = (u32)0x33333333;
+	mmdc_p0->mprddqby3dl    = (u32)0x33333333;
+	/* Complete calibration by forced measurement */
+	mmdc_p0->mpmur0         = (u32)0x00000800;
+
+	mmdc_p0->mdpdc          = (u32)0x0002002D;
+	mmdc_p0->mdotc          = (u32)0x00333040;
+	mmdc_p0->mdcfg0         = (u32)0x8B8F52F3;
+	mmdc_p0->mdcfg1         = (u32)0xB66D8B63;
+	mmdc_p0->mdcfg2         = (u32)0x01FF00DB;
+	mmdc_p0->mdmisc         = (u32)0x00011740;
+
+	mmdc_p0->mdscr          = (u32)0x00008000;
+	mmdc_p0->mdrwd          = (u32)0x000026D2;
+	mmdc_p0->mdor           = (u32)0x008F1023;
+	mmdc_p0->mdasp          = (u32)0x00000047;
+
+	mmdc_p0->mdctl          = (u32)0x85190000;
+
+	mmdc_p0->mdscr          = (u32)0x02008032;
+	mmdc_p0->mdscr          = (u32)0x00008033;
+	mmdc_p0->mdscr          = (u32)0x00048031;
+	mmdc_p0->mdscr          = (u32)0x15208030;
+	mmdc_p0->mdscr          = (u32)0x04008040;
+
+	mmdc_p0->mdref          = (u32)0x00007800;
+	mmdc_p0->mpodtctrl      = (u32)0x00022227;
+
+	mmdc_p0->mdpdc          = (u32)0x0002556D;
+	mmdc_p0->mdscr          = (u32)0x00000000;
+}
+
 /*
  * Sizes are in MiB
  */
@@ -714,7 +766,10 @@ void var_legacy_dram_init(bool is_som_solo)
 		spl_dram_init_mx6q_2g();
 		ram_size = get_actual_ram_size(2048);
 #else
-		if (get_cpu_speed_grade_hz() == 1200000000) {
+		if (is_som_solo) {
+			spl_dram_init_vsm_dual_2gb();
+			ram_size = get_actual_ram_size(2048);
+		} else if (get_cpu_speed_grade_hz() == 1200000000) {
 			spl_dram_init_mx6q_2g();
 			ram_size = get_actual_ram_size(2048);
 		} else {
