@@ -32,6 +32,9 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 static struct var_eeprom eeprom = {0};
+extern struct dram_timing_info dram_timing_1g;
+extern struct dram_timing_info dram_timing_2g;
+extern struct dram_timing_info dram_timing_4g;
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -61,10 +64,38 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 static void spl_dram_init(void)
 {
+	int k=0;
 	/* EEPROM initialization */
 	var_eeprom_read_header(&eeprom);
-	var_eeprom_adjust_dram(&eeprom, &dram_timing);
-	ddr_init(&dram_timing);
+
+	puts("Do you want to erase EEPROM?[Y/N]\n");
+	mdelay(1000);
+	if(tstc()!=0)
+		if(getc()=='Y')
+		{
+			printf("Erasing EEPROM\n");
+			memset(&eeprom,0xFF,sizeof(eeprom));
+		}
+	
+	if(!var_eeprom_is_valid(&eeprom))
+	{
+		k=ddr_init(&dram_timing_1g);
+		printf("Trying 1G %s\n",k==0?"OK":"BAD");
+		k=ddr_init(&dram_timing_2g);
+		printf("Trying 2G %s\n",k==0?"OK":"BAD");
+		k=ddr_init(&dram_timing_4g);
+		printf("Trying 4G %s\n",k==0?"OK":"BAD");
+		k=ddr_init(&dram_timing_4g);
+		if(k!=0)
+			k=ddr_init(&dram_timing_2g);
+		if(k!=0)
+			k=ddr_init(&dram_timing_1g);
+	}
+	else
+	{
+		var_eeprom_adjust_dram(&eeprom, &dram_timing_4g);
+		ddr_init(&dram_timing_4g);
+	}
 }
 
 #define I2C_PAD_CTRL (PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PE)
@@ -269,15 +300,6 @@ void spl_board_init(void)
 
 	puts("Normal Boot\n");
 
-	puts("Normal Boot\n");
-	puts("Do you want to erase EEPROM?[Y/N]\n");
-	mdelay(1000);
-	if(tstc()!=0)
-		if(getc()=='Y')
-		{
-			printf("Erasing EEPROM\n");
-			memset(&eeprom,0xFF,sizeof(*ep));
-		}
 	/* Copy EEPROM contents to DRAM */
 	memcpy(ep, &eeprom, sizeof(*ep));
 }
