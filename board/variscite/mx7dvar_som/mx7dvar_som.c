@@ -131,7 +131,7 @@ struct i2c_pads_info i2c_pad_info3 = {
 #endif
 
 #ifdef CONFIG_SYS_I2C
-static int var_eeprom_get_ram_size(void)
+static unsigned long var_eeprom_get_ram_size(void)
 {
 	u16 read_eeprom_magic;
 	u8  read_ram_size;
@@ -139,7 +139,7 @@ static int var_eeprom_get_ram_size(void)
 	i2c_set_bus_num(EEPROM_I2C_BUS);
 	if (i2c_probe(EEPROM_I2C_ADDR)) {
 		eeprom_debug("\nError: Couldn't find EEPROM device\n");
-		return -1;
+		return 0;
 	}
 
 	if ((i2c_read(EEPROM_I2C_ADDR,
@@ -154,12 +154,12 @@ static int var_eeprom_get_ram_size(void)
 			sizeof(read_ram_size))))
 	{
 		eeprom_debug("\nError reading data from EEPROM\n");
-		return -1;
+		return 0;
 	}
 
 	if (EEPROM_MAGIC != read_eeprom_magic) {
 		eeprom_debug("\nError: Data on EEPROM is invalid\n");
-		return -1;
+		return 0;
 	}
 
 	return (read_ram_size * SZ_128M);
@@ -169,18 +169,20 @@ static int var_eeprom_get_ram_size(void)
 int dram_init(void)
 {
 #ifdef CONFIG_SYS_I2C
-	int eeprom_ram_size = var_eeprom_get_ram_size();
+	unsigned long eeprom_ram_size = var_eeprom_get_ram_size();
+	unsigned long maxsize;
 
-	if (eeprom_ram_size > 0)
-		if (get_ram_size((void *)PHYS_SDRAM, PHYS_SDRAM_SIZE) != eeprom_ram_size) {
-			printf("Error: RAM size from EEPROM: %d, RAM size from get_ram_size(): %ld\n",
+	if (eeprom_ram_size > 0) {
+		maxsize = max(eeprom_ram_size, (unsigned long) PHYS_SDRAM_SIZE);
+		if (get_ram_size((void *)PHYS_SDRAM, maxsize) != eeprom_ram_size) {
+			printf("Error: RAM size from EEPROM: %lu, RAM size from get_ram_size(): %lu\n",
 					eeprom_ram_size,
-					get_ram_size((void *)PHYS_SDRAM, PHYS_SDRAM_SIZE));
+					get_ram_size((void *)PHYS_SDRAM, maxsize));
 			hang();
 		} else {
 			gd->ram_size = eeprom_ram_size;
 		}
-	else
+	} else
 #endif
 		gd->ram_size = get_ram_size((void *)PHYS_SDRAM, PHYS_SDRAM_SIZE);
 
