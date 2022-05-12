@@ -118,9 +118,9 @@ int board_mmc_init(bd_t *bis)
 			gpio_request(USDHC1_ROUTE_GPIO, "sd1_route");
 			gpio_direction_output(USDHC1_ROUTE_GPIO, 0);
 			gpio_request(USDHC1_PWR_GPIO, "sd1_pwr");
-                        gpio_direction_output(USDHC1_PWR_GPIO, 0);
-                        mdelay(10);
-                        gpio_direction_output(USDHC1_PWR_GPIO, 1);
+			gpio_direction_output(USDHC1_PWR_GPIO, 0);
+			mdelay(10);
+			gpio_direction_output(USDHC1_PWR_GPIO, 1);
 			break;
 
 		default:
