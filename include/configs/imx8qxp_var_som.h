@@ -179,6 +179,7 @@
 	"mmcboot=echo Booting from USB;" \
 		"usb start;" \
 		"run mmcargs;" \
+		"run optargs;" \
 		"usb start;" \
 		"load usb 0:1 ${fdt_addr} ${bootdir}/${fdt_file};" \
 		"load usb 0:1 ${img_addr} ${bootdir}/${image};" \
