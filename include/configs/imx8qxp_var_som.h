@@ -166,7 +166,7 @@
 	"mmcpart=1\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
 	"mmcargs=setenv bootargs console=${console},${baudrate} earlycon " \
-	"root=/dev/sda1 rootfstype=ext4 rootwait rw;\0" \
+		"root=/dev/sda1 rootfstype=ext4 rootwait rw\0" \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
