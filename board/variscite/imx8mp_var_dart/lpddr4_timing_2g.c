@@ -1058,7 +1058,8 @@ static struct dram_cfg_param ddr_ddrphy_trained_csr[] = {
 	{ 0x13730, 0x0 },
 	{ 0x13830, 0x0 },
 };
-/* P0 message block paremeter for training firmware */
+
+/* P0 message block parameter for training firmware */
 static struct dram_cfg_param ddr_fsp0_cfg[] = {
 	{ 0xd0000, 0x0 },
 	{ 0x54003, 0xfa0 },
@@ -1097,8 +1098,7 @@ static struct dram_cfg_param ddr_fsp0_cfg[] = {
 	{ 0xd0000, 0x1 },
 };
 
-
-/* P1 message block paremeter for training firmware */
+/* P1 message block parameter for training firmware */
 static struct dram_cfg_param ddr_fsp1_cfg[] = {
 	{ 0xd0000, 0x0 },
 	{ 0x54002, 0x101 },
@@ -1138,8 +1138,7 @@ static struct dram_cfg_param ddr_fsp1_cfg[] = {
 	{ 0xd0000, 0x1 },
 };
 
-
-/* P2 message block paremeter for training firmware */
+/* P2 message block parameter for training firmware */
 static struct dram_cfg_param ddr_fsp2_cfg[] = {
 	{ 0xd0000, 0x0 },
 	{ 0x54002, 0x102 },
@@ -1179,8 +1178,7 @@ static struct dram_cfg_param ddr_fsp2_cfg[] = {
 	{ 0xd0000, 0x1 },
 };
 
-
-/* P0 2D message block paremeter for training firmware */
+/* P0 2D message block parameter for training firmware */
 static struct dram_cfg_param ddr_fsp0_2d_cfg[] = {
 	{ 0xd0000, 0x0 },
 	{ 0x54003, 0xfa0 },
@@ -1802,7 +1800,7 @@ static struct dram_cfg_param ddr_phy_pie[] = {
 	{ 0x20089, 0x1 },
 	{ 0x20088, 0x19 },
 	{ 0xc0080, 0x2 },
-	{ 0xd0000, 0x1 }
+	{ 0xd0000, 0x1 },
 };
 
 static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
@@ -1850,4 +1848,3 @@ struct dram_timing_info dram_timing_2g = {
 	.ddrphy_pie_num = ARRAY_SIZE(ddr_phy_pie),
 	.fsp_table = { 4000, 400, 100, },
 };
-
