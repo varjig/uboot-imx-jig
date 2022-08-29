@@ -35,6 +35,7 @@ static struct var_eeprom eeprom = {0};
 extern struct dram_timing_info dram_timing_1g;
 extern struct dram_timing_info dram_timing_2g;
 extern struct dram_timing_info dram_timing_4g;
+extern struct dram_timing_info dram_timing_8g;
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -85,7 +86,11 @@ static void spl_dram_init(void)
 		printf("Trying 2G %s\n",k==0?"OK":"BAD");
 		k=ddr_init(&dram_timing_4g);
 		printf("Trying 4G %s\n",k==0?"OK":"BAD");
-		k=ddr_init(&dram_timing_4g);
+		k=ddr_init(&dram_timing_8g);
+		printf("Trying 8G %s\n",k==0?"OK":"BAD");
+		k=ddr_init(&dram_timing_8g);
+		if(k!=0)
+			k=ddr_init(&dram_timing_4g);
 		if(k!=0)
 			k=ddr_init(&dram_timing_2g);
 		if(k!=0)
@@ -93,6 +98,7 @@ static void spl_dram_init(void)
 	}
 	else
 	{
+		/* dram_timing_4g is the default base configuration */
 		var_eeprom_adjust_dram(&eeprom, &dram_timing_4g);
 		ddr_init(&dram_timing_4g);
 	}
