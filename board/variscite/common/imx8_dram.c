@@ -65,6 +65,7 @@ phys_size_t get_effective_memsize(void)
 	u64 phys_sdram_1_size = dram_size;
 
 	if (dram_size > 0x80000000ULL) {
+		printf("DRAM_Size is %d, reducing it to %d\n", dram_size>>20,0x80000000ULL>>20);
 		phys_sdram_1_size = 0x80000000ULL;
 	}
 
