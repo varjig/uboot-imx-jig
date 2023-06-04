@@ -56,6 +56,14 @@ void spl_board_init(void)
 	if (ret)
 		printf("Fail to start RNG: %d\n", ret);
 
+	puts("Do you want to erase EEPROM?[Y/N]\n");
+	mdelay(1000);
+	if(tstc()!=0)
+		if(getchar()=='Y')
+		{
+			printf("Erasing EEPROM\n");
+			memset(&eeprom,0xFF,sizeof(*ep));
+		}
 	/* Copy EEPROM contents to DRAM */
 	memcpy(ep, &eeprom, sizeof(*ep));
 }
@@ -100,8 +108,8 @@ int power_init_board(void)
 	/* I2C_LT_EN*/
 	pmic_reg_write(dev, 0xa, 0x3);
 
-	/* set WDOG_B_CFG to cold reset */
-	pmic_reg_write(dev, PCA9450_RESET_CTRL, 0xA1);
+	/* disable WDOG and System resets */
+	pmic_reg_write(dev, PCA9450_RESET_CTRL, 0x01);
 
 	/* Enable load switch for ETH_3V3 */
 	pmic_clrsetbits(dev, PCA9450_LOADSW_CTRL, 0, BIT(1) | BIT(0));
