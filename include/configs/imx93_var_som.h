@@ -81,8 +81,8 @@
 	"mmcpart=1\0" \
 	"mmcautodetect=yes\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
-	"mmcargs=setenv bootargs ${jh_clk} console=${console} \
-		root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait rw\0 " \
+	"mmcargs=setenv bootargs ${jh_clk} console=${console} audit=0 " \
+		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait rw\0 " \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
