@@ -50,15 +50,6 @@ void spl_board_init(void)
 	struct var_eeprom *ep = VAR_EEPROM_DATA;
 
 	puts("Normal Boot\n");
-
-	puts("Do you want to erase EEPROM?[Y/N]\n");
-	mdelay(1000);
-	if(tstc()!=0)
-		if(getchar()=='Y')
-		{
-			printf("Erasing EEPROM\n");
-			memset(&eeprom,0xFF,sizeof(*ep));
-		}
 	/* Copy EEPROM contents to DRAM */
 	memcpy(ep, &eeprom, sizeof(*ep));
 }
@@ -67,8 +58,17 @@ void spl_dram_init(void)
 {
 	/* EEPROM initialization */
 	var_eeprom_read_header(&eeprom);
-	var_eeprom_adjust_dram(&eeprom, &dram_timing);
 
+	puts("Do you want to erase EEPROM?[Y/N]\n");
+	mdelay(1000);
+	if(tstc()!=0)
+		if(getchar()=='Y')
+		{
+			printf("Erasing EEPROM\n");
+			memset(&eeprom,0xFF,0xFF);
+		}
+
+	var_eeprom_adjust_dram(&eeprom, &dram_timing);
 	ddr_init(&dram_timing);
 }
 
@@ -143,6 +143,7 @@ void board_init_f(ulong dummy)
 	/* Setup TRDC for DDR access */
 	trdc_init();
 
+	printf("Starting DRAM Init\n");
 	/* DDR initialization */
 	spl_dram_init();
 
