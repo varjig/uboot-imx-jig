@@ -1,10 +1,14 @@
 /*
- * Copyright 2018 NXP
+ * Copyright 2019 NXP
  *
  * SPDX-License-Identifier:	GPL-2.0+
  *
  * Generated code from MX8M_DDR_tool
- * Align with uboot-imx_v2018.03_4.14.78_1.0.0_ga
+ *
+ * Align with uboot version:
+ * imx_v2019.04_5.4.x and above version
+ * For imx_v2018.03_4.14.78_1.0.0_ga ~ imx_v2018.04_4.19.35_1.1.0_ga:
+ * please replace #include <asm/arch/ddr.h> with #include <asm/arch/imx8m_ddr.h>
  */
 
 #include <linux/kernel.h>
@@ -36,7 +40,7 @@ static struct dram_cfg_param ddr_ddrc_cfg[] = {
 	{ 0x3d400134, 0xa100002 },
 	{ 0x3d400138, 0x17 },
 	{ 0x3d400144, 0x220011 },
-	{ 0x3d400180, 0xc0a70006 },
+	{ 0x3d400180, 0x0a70006 },
 	{ 0x3d400184, 0x901463 },
 	{ 0x3d400188, 0x0 },
 	{ 0x3d400190, 0x3858202 },
@@ -47,7 +51,7 @@ static struct dram_cfg_param ddr_ddrc_cfg[] = {
 	{ 0x3d4001b0, 0x11 },
 	{ 0x3d4001b4, 0x502 },
 	{ 0x3d4001c0, 0x1 },
-	{ 0x3d4001c4, 0x1 },
+	{ 0x3d4001c4, 0x0 },
 	{ 0x3d4000f4, 0x639 },
 	{ 0x3d400108, 0x3050c0d },
 	{ 0x3d400200, 0x1f },
@@ -111,12 +115,6 @@ static struct dram_cfg_param ddr_ddrphy_cfg[] = {
 	{ 0x130a5, 0x6 },
 	{ 0x130a6, 0x0 },
 	{ 0x130a7, 0x2 },
-	{ 0x20110, 0x2 },
-	{ 0x20111, 0x3 },
-	{ 0x20112, 0x4 },
-	{ 0x20113, 0x5 },
-	{ 0x20114, 0x0 },
-	{ 0x20115, 0x1 },
 	{ 0x1005f, 0x1ff },
 	{ 0x1015f, 0x1ff },
 	{ 0x1105f, 0x1ff },
@@ -195,6 +193,12 @@ static struct dram_cfg_param ddr_ddrphy_cfg[] = {
 	{ 0x2002d, 0x0 },
 	{ 0x200c7, 0x80 },
 	{ 0x200ca, 0x106 },
+	{ 0x20110, 0x2 },
+	{ 0x20111, 0x3 },
+	{ 0x20112, 0x4 },
+	{ 0x20113, 0x5 },
+	{ 0x20114, 0x0 },
+	{ 0x20115, 0x1 },
 };
 
 /* P0 message block parameter for training firmware */
@@ -207,7 +211,6 @@ static struct dram_cfg_param ddr_fsp0_cfg[] = {
 	{ 0x54008, 0x131f },
 	{ 0x54009, 0xc8 },
 	{ 0x5400b, 0x2 },
-	{ 0x5400d, 0x100 },
 	{ 0x54012, 0x110 },
 	{ 0x54019, 0x994 },
 	{ 0x5401a, 0x31 },
@@ -738,7 +741,7 @@ static struct dram_cfg_param ddr_phy_pie[] = {
 	{ 0x90011, 0xdfbd },
 	{ 0x90012, 0x60 },
 	{ 0x90013, 0x6152 },
-	{ 0x20010, 0x5a },
+	{ 0x20010, 0x0 },
 	{ 0x20011, 0x3 },
 	{ 0x40080, 0xe0 },
 	{ 0x40081, 0x12 },
