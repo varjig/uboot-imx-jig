@@ -87,7 +87,7 @@ static inline void decode_streaming_message(void)
 	ddr_printf("\n");
 }
 
-void wait_ddrphy_training_complete(void)
+int wait_ddrphy_training_complete(void)
 {
 	unsigned int mail;
 	while (1) {
@@ -97,10 +97,10 @@ void wait_ddrphy_training_complete(void)
 			decode_streaming_message();
 		} else if (mail == 0x07) {
 			ddr_printf("Training PASS\n");
-			break;
+			return 0;
 		} else if (mail == 0xff) {
-			printf("Training FAILED\n");
-			break;
+			debug("Training FAILED\n");
+			return -1;
 		}
 	}
 }
