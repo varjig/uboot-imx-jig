@@ -29,17 +29,33 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-extern struct dram_timing_info dram_timing, dram_timing_b0, dram_timing_default;
+extern struct dram_timing_info dram_timing, dram_timing_b0, dram_timing_default, dram_timing_2GB, dram_timing_4GB;
 
 void spl_dram_init(void)
 {
+	int result = 0;
 	struct var_eeprom eeprom;
 
 	var_eeprom_read_header(&eeprom);
 
 	if (!var_eeprom_is_valid(&eeprom)) {
-		printf("No DRAM info in EEPROM, using defaut DRAM config\n");
-		ddr_init(&dram_timing_default);
+		printf("No DRAM info in EEPROM, using one of the defaut DRAM configs\n");
+
+		printf("Trying 4GB: ");
+		result = ddr_init(&dram_timing_4GB);
+		printf("%s\n", (result == 0) ? "OK" : "BAD");
+
+		if (result != 0) {
+			printf("Trying 2GB: ");
+			result = ddr_init(&dram_timing_2GB);
+			printf("%s\n", (result == 0) ? "OK" : "BAD");
+		}
+
+		if (result != 0) {
+			printf("Trying default: ");
+			result = ddr_init(&dram_timing_default);
+			printf("%s\n", (result == 0) ? "OK" : "BAD");
+		}
 	}
 	else if ((get_cpu_rev() & 0xfff) == CHIP_REV_2_1) {
 		var_eeprom_adjust_dram(&eeprom, &dram_timing);
