@@ -108,9 +108,9 @@
 	"findfdt=" \
 		"if test $fdt_file = undefined; then " \
 			"if test ${som_rev} -lt 2; then " \
-				"setenv fdt_file imx93-var-som-1.x-symphony.dtb; " \
+				"setenv fdt_file imx93-var-som-1.x-jig.dtb; " \
 			"else " \
-				"setenv fdt_file imx93-var-som-symphony.dtb; " \
+				"setenv fdt_file imx93-var-som-jig.dtb; " \
 			"fi; " \
 		"fi; " \
 		"echo fdt_file=${fdt_file};\0" \
