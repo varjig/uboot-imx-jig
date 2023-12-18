@@ -76,7 +76,7 @@
 		"stopaux; " \
 		"bootaux ${m33_addr_auxview};\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
-	"mmcargs=setenv bootargs ${jh_clk} console=${console} \
+	"mmcargs=setenv bootargs ${jh_clk} console=${console} audit=0 \
 		${cma_size} cma_name=linux,cma \
 		root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait rw\0 " \
 	"bootenv=uEnv.txt\0" \

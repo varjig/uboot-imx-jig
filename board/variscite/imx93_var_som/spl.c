@@ -64,8 +64,17 @@ void spl_dram_init(void)
 {
 	/* EEPROM initialization */
 	var_eeprom_read_header(&eeprom);
-	var_eeprom_adjust_dram(&eeprom, &dram_timing);
 
+	puts("Do you want to erase EEPROM?[Y/N]\n");
+	mdelay(1000);
+	if(tstc()!=0)
+		if(getchar()=='Y')
+		{
+			printf("Erasing EEPROM\n");
+			memset(&eeprom,0xFF,0xFF);
+		}
+
+	var_eeprom_adjust_dram(&eeprom, &dram_timing);
 	ddr_init(&dram_timing);
 }
 
@@ -117,6 +126,10 @@ int power_init_board(void)
 
 	/* Enable load switch for ETH_3V3 */
 	pmic_clrsetbits(dev, PCA9450_LOADSW_CTRL, 0, BIT(1) | BIT(0));
+
+	/* Disable WDOG and System resets */
+	pmic_reg_write(dev, PCA9450_RESET_CTRL, 0x01);
+
 	return 0;
 }
 #endif
@@ -156,6 +169,7 @@ void board_init_f(ulong dummy)
 	/* Setup TRDC for DDR access */
 	trdc_init();
 
+	printf("Starting DRAM Init\n");
 	/* DDR initialization */
 	spl_dram_init();
 

@@ -21,7 +21,6 @@
 #include <dwc3-uboot.h>
 
 #include "../common/imx9_eeprom.h"
-#include "../common/extcon-ptn5150.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -74,22 +73,6 @@ static int setup_eqos(void)
 	return set_clk_eqos(ENET_125MHZ);
 }
 
-#ifdef CONFIG_EXTCON_PTN5150
-static struct extcon_ptn5150 usb_ptn5150;
-int board_ehci_usb_phy_mode(struct udevice *dev)
-{
-	int usb_phy_mode = extcon_ptn5150_phy_mode(&usb_ptn5150);
-
-	/* Default to host mode if not connected */
-	if (usb_phy_mode < 0) {
-		printf("Defaulting to USB Host");
-		usb_phy_mode = USB_INIT_HOST;
-	}
-
-	return usb_phy_mode;
-}
-#endif
-
 int board_init(void)
 {
 	if (IS_ENABLED(CONFIG_DWC_ETH_QOS))
@@ -104,13 +87,7 @@ int board_late_init(void)
 {
 	struct var_eeprom *ep = VAR_EEPROM_DATA;
 	char sdram_size_str[SDRAM_SIZE_STR_LEN];
-	struct var_carrier_eeprom carrier_eeprom;
-	char carrier_rev[CARRIER_REV_LEN] = {0};
 	char som_rev[CARRIER_REV_LEN] = {0};
-
-	if (CONFIG_IS_ENABLED(EXTCON_PTN5150)) {
-		extcon_ptn5150_setup(&usb_ptn5150);
-	}
 
 	var_setup_mac(ep);
 	var_eeprom_print_prod_info(ep);
@@ -121,11 +98,6 @@ int board_late_init(void)
 	snprintf(sdram_size_str, SDRAM_SIZE_STR_LEN, "%d",
 		(int) (gd->ram_size / 1024 / 1024));
 	env_set("sdram_size", sdram_size_str);
-
-	/* Carrier Board ENV */
-	var_carrier_eeprom_read(VAR_CARRIER_EEPROM_I2C_NAME, CARRIER_EEPROM_ADDR, &carrier_eeprom);
-	var_carrier_eeprom_get_revision(&carrier_eeprom, carrier_rev, sizeof(carrier_rev));
-	env_set("carrier_rev", carrier_rev);
 
 	/* SoM Features */
 	if (ep->features & VAR_EEPROM_F_WBE)
