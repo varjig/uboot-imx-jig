@@ -85,6 +85,7 @@ int power_init_board(void)
 	int ret;
 	unsigned int val = 0;
 
+	pmic_get("pmic@25", &dev);
 	ret = pmic_get("pmic@25", &dev);
 	if (ret == -ENODEV) {
 		puts("No pca9450@25\n");
