@@ -122,9 +122,6 @@ int power_init_board(void)
 	else
 		pmic_reg_write(dev, PCA9450_BUCK1OUT_DVS1, 0x4);
 
-	/* I2C_LT_EN*/
-	pmic_reg_write(dev, 0xa, 0x3);
-
 	/* Enable load switch for ETH_3V3 */
 	pmic_clrsetbits(dev, PCA9450_LOADSW_CTRL, 0, BIT(1) | BIT(0));
 
