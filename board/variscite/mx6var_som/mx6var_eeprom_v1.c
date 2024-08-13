@@ -383,19 +383,22 @@ int var_eeprom_v1_dram_init(void)
 	int character;
 
 	printf("Do you want to erase EEPROM?[Y/N]\n");
-	mdelay(1000);
-	if(tstc()!=0)
-		if(getc()=='Y')
+	mdelay(2000);
+	if(tstc() != 0)
+		if(getc() == 'Y')
 		{
 			printf("Using Legacy\n");
 			is_legacy = true;
 		}
 		
 	printf("Is this 2/4GB SOM? Press 2/4!\n");
-	mdelay(1000);
-	if(tstc()!=0)
+	mdelay(4000);
+	if(tstc() != 0)
 	{
 		character=getc();
+		while((tstc() != 0) && (character == 0x0A))
+			character=getc();
+
 		if(character=='4')
 		{
 			printf("Using 4GB defaults!\n");
