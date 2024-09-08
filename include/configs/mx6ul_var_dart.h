@@ -208,32 +208,32 @@
 				"if test -n $soc_type; then " \
 					"if test $boot_dev = sd; then " \
 						"if test $som_storage = emmc || test $som_storage = none; then " \
-							"setenv fdt_file jig-${soc_type}-var-dart-sd_emmc.dtb; " \
+							"setenv fdt_file jig-${soc_type}-var-dart-sd_emmc${snd_postfix}.dtb; " \
 						"fi; " \
 						"if test $som_storage = nand; then " \
-							"setenv fdt_file jig-${soc_type}-var-dart-sd_nand.dtb; " \
+							"setenv fdt_file jig-${soc_type}-var-dart-sd_nand${snd_postfix}.dtb; " \
 						"fi; " \
 					"fi; " \
 					"if test $boot_dev = emmc; then " \
 						"if test $wifi = yes; then " \
 							"if test $som_rev = 5G; then " \
-								"setenv fdt_file jig-${soc_type}-var-dart-5g-emmc_wifi.dtb; " \
+								"setenv fdt_file jig-${soc_type}-var-dart-5g-emmc_wifi${snd_postfix}.dtb; " \
 							"else " \
-								"setenv fdt_file jig-${soc_type}-var-dart-emmc_wifi.dtb; " \
+								"setenv fdt_file jig-${soc_type}-var-dart-emmc_wifi${snd_postfix}.dtb; " \
 							"fi; " \
 						"else " \
-							"setenv fdt_file jig-${soc_type}-var-dart-sd_emmc.dtb; " \
+							"setenv fdt_file jig-${soc_type}-var-dart-sd_emmc${snd_postfix}.dtb; " \
 						"fi; " \
 					"fi; " \
 					"if test $boot_dev = nand; then " \
 						"if test $wifi = yes; then " \
 							"if test $som_rev = 5G; then " \
-								"setenv fdt_file jig-${soc_type}-var-dart-5g-nand_wifi.dtb; " \
+								"setenv fdt_file jig-${soc_type}-var-dart-5g-nand_wifi${snd_postfix}.dtb; " \
 							"else " \
-								"setenv fdt_file jig-${soc_type}-var-dart-nand_wifi.dtb; " \
+								"setenv fdt_file jig-${soc_type}-var-dart-nand_wifi${snd_postfix}.dtb; " \
 							"fi; " \
 						"else " \
-							"setenv fdt_file jig-${soc_type}-var-dart-sd_nand.dtb; " \
+							"setenv fdt_file jig-${soc_type}-var-dart-sd_nand${snd_postfix}.dtb; " \
 						"fi; " \
 					"fi; " \
 				"fi; " \
@@ -242,32 +242,32 @@
 				"if test -n $soc_type; then " \
 					"if test $boot_dev = sd; then " \
 						"if test $som_storage = emmc || test $som_storage = none; then " \
-							"setenv fdt_file jig-${soc_type}-var-som-sd_emmc.dtb; " \
+							"setenv fdt_file jig-${soc_type}-var-som-sd_emmc${snd_postfix}.dtb; " \
 						"fi; " \
 						"if test $som_storage = nand; then " \
-							"setenv fdt_file jig-${soc_type}-var-som-sd_nand.dtb; " \
+							"setenv fdt_file jig-${soc_type}-var-som-sd_nand${snd_postfix}.dtb; " \
 						"fi; " \
 					"fi; " \
 					"if test $boot_dev = emmc; then " \
 						"if test $wifi = yes; then " \
 							"if test $som_rev = 5G; then " \
-								"setenv fdt_file jig-${soc_type}-var-som-5g-emmc_wifi.dtb; " \
+								"setenv fdt_file jig-${soc_type}-var-som-5g-emmc_wifi${snd_postfix}.dtb; " \
 							"else " \
-								"setenv fdt_file jig-${soc_type}-var-som-emmc_wifi.dtb; " \
+								"setenv fdt_file jig-${soc_type}-var-som-emmc_wifi${snd_postfix}.dtb; " \
 							"fi; " \
 						"else " \
-							"setenv fdt_file jig-${soc_type}-var-som-sd_emmc.dtb; " \
+							"setenv fdt_file jig-${soc_type}-var-som-sd_emmc${snd_postfix}.dtb; " \
 						"fi; " \
 					"fi; " \
 					"if test $boot_dev = nand; then " \
 						"if test $wifi = yes; then " \
 							"if test $som_rev = 5G; then " \
-								"setenv fdt_file jig-${soc_type}-var-som-5g-nand_wifi.dtb; " \
+								"setenv fdt_file jig-${soc_type}-var-som-5g-nand_wifi${snd_postfix}.dtb; " \
 							"else " \
-								"setenv fdt_file jig-${soc_type}-var-som-nand_wifi.dtb; " \
+								"setenv fdt_file jig-${soc_type}-var-som-nand_wifi${snd_postfix}.dtb; " \
 							"fi; " \
 						"else " \
-							"setenv fdt_file jig-${soc_type}-var-som-sd_nand.dtb; " \
+							"setenv fdt_file jig-${soc_type}-var-som-sd_nand${snd_postfix}.dtb; " \
 						"fi; " \
 					"fi; " \
 				"fi; " \
