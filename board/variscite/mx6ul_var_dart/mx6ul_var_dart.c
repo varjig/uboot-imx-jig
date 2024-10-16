@@ -903,6 +903,12 @@ int board_late_init(void)
 	case 0x1:
 		setenv("som_rev", "5G"); /* Rev 2.x */
 		break;
+	case 0x2:
+		setenv("som_rev", "5G IW611");
+		break;
+	case 0x3:
+		setenv("som_rev", "5G IW612");
+		break;
 	default:
 		setenv("som_rev", "unknown");
 		break;
