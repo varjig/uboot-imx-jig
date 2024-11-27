@@ -115,6 +115,20 @@ struct i2c_pads_info i2c_pad_info1 = {
 	},
 };
 
+/* I2C2 for Codec */
+struct i2c_pads_info i2c_pad_info2 = {
+	.scl = {
+		.i2c_mode = MX7D_PAD_I2C2_SCL__I2C2_SCL | PC,
+		.gpio_mode = MX7D_PAD_I2C2_SCL__GPIO4_IO10 | PC,
+		.gp = IMX_GPIO_NR(4, 10),
+	},
+	.sda = {
+		.i2c_mode = MX7D_PAD_I2C2_SDA__I2C2_SDA | PC,
+		.gpio_mode = MX7D_PAD_I2C2_SDA__GPIO4_IO11 | PC,
+		.gp = IMX_GPIO_NR(4, 11),
+	},
+};
+
 #endif
 
 #ifdef CONFIG_SYS_I2C
@@ -688,6 +702,7 @@ int board_early_init_f(void)
 
 #if defined(CONFIG_SYS_I2C_MXC) && !defined(CONFIG_DM_I2C)
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
+	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
 #endif
 
 	return 0;
