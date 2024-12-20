@@ -255,16 +255,32 @@
 		"if test $fdt_file = undefined; then " \
 			"if test $som_rev = EMMC; then " \
 				"if test ${use_m4} = yes; then " \
-					"setenv fdt_file imx7d-var-som-emmc-m4.dtb; " \
+					"if test -n $codec && test $codec = wm8731; then " \
+					    "setenv fdt_file imx7d-var-som-emmc-m4-${codec}.dtb; " \
+					"else " \
+					    "setenv fdt_file imx7d-var-som-emmc-m4.dtb; " \
+					"fi; " \
 				"else " \
-					"setenv fdt_file imx7d-var-som-emmc.dtb; " \
+					"if test -n $codec && test $codec = wm8731; then " \
+					    "setenv fdt_file imx7d-var-som-emmc-${codec}.dtb; " \
+					"else " \
+					    "setenv fdt_file imx7d-var-som-emmc.dtb; " \
+					"fi; " \
 				"fi; " \
 			"fi; " \
 			"if test $som_rev = NAND; then " \
 				"if test ${use_m4} = yes; then " \
-					"setenv fdt_file imx7d-var-som-nand-m4.dtb; " \
+					"if test -n $codec && test $codec = wm8731; then " \
+					    "setenv fdt_file imx7d-var-som-nand-m4-${codec}.dtb; " \
+					"else " \
+					    "setenv fdt_file imx7d-var-som-nand-m4.dtb; " \
+					"fi; " \
 				"else " \
-					"setenv fdt_file imx7d-var-som-nand.dtb; " \
+					"if test -n $codec && test $codec = wm8731; then " \
+					    "setenv fdt_file imx7d-var-som-nand-${codec}.dtb; " \
+					"else " \
+					    "setenv fdt_file imx7d-var-som-nand.dtb; " \
+					"fi; " \
 				"fi; " \
 			"fi; " \
 			"if test $fdt_file = undefined; then " \
