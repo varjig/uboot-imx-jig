@@ -21,7 +21,6 @@
 #include <dwc3-uboot.h>
 
 #include "../common/imx9_eeprom.h"
-#include "../common/extcon-ptn5150.h"
 #include "imx91_var_som.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -52,50 +51,6 @@ int get_board_id(void)
 
 	return VAR_SOM_MX91;
 }
-
-int extract_carrier_name(char *carrier_rev, char *carrier_name) {
-
-	int len = 0;
-
-	if ((carrier_rev == NULL) || (*carrier_rev == '\0')) {
-		return -1;
-	}
-
-	len = strlen(carrier_rev);
-
-	while (len > 0 && !isalpha(carrier_rev[len])) {
-		len--;
-	}
-
-	len++;
-
-	strncpy(carrier_name, carrier_rev, len);
-	carrier_name[len] = '\0';
-
-	return len;
-}
-
-#if defined(CONFIG_MULTI_DTB_FIT) && !defined(CONFIG_SPL_BUILD)
-int board_fit_config_name_match(const char *name)
-{
-	int board_id = get_board_id();
-
-	switch (board_id) {
-	case DART_MX91:
-		if (!strcmp(name, "imx91-var-dart-dt8mcustomboard"))
-			return 0;
-		break;
-	case VAR_SOM_MX91:
-		if (!strcmp(name, "imx91-var-som-symphony"))
-			return 0;
-		break;
-	default:
-		return -1;
-	}
-
-	return -1;
-}
-#endif
 
 int board_early_init_f(void)
 {
@@ -134,22 +89,6 @@ static int setup_eqos(void)
 	return set_clk_eqos(ENET_125MHZ);
 }
 
-#ifdef CONFIG_EXTCON_PTN5150
-static struct extcon_ptn5150 usb_ptn5150;
-int board_ehci_usb_phy_mode(struct udevice *dev)
-{
-	int usb_phy_mode = extcon_ptn5150_phy_mode(&usb_ptn5150);
-
-	/* Default to host mode if not connected */
-	if (usb_phy_mode < 0) {
-		printf("Defaulting to USB Host");
-		usb_phy_mode = USB_INIT_HOST;
-	}
-
-	return usb_phy_mode;
-}
-#endif
-
 int board_init(void)
 {
 	if (IS_ENABLED(CONFIG_DWC_ETH_QOS))
@@ -165,15 +104,7 @@ int board_late_init(void)
 	struct var_eeprom *ep = VAR_EEPROM_DATA;
 	int id = get_board_id();
 	char sdram_size_str[SDRAM_SIZE_STR_LEN];
-	struct var_carrier_eeprom carrier_eeprom;
-	char carrier_rev[CARRIER_REV_LEN] = {0};
-	char carrier_name[CARRIER_REV_LEN] = {0};
 	char som_rev[CARRIER_REV_LEN] = {0};
-
-#ifdef CONFIG_EXTCON_PTN5150
-	if (id == VAR_SOM_MX91)
-		extcon_ptn5150_setup(&usb_ptn5150);
-#endif
 
 	var_setup_mac(ep);
 	var_eeprom_print_prod_info(ep);
@@ -184,15 +115,6 @@ int board_late_init(void)
 	snprintf(sdram_size_str, SDRAM_SIZE_STR_LEN, "%d",
 		(int) (gd->ram_size / 1024 / 1024));
 	env_set("sdram_size", sdram_size_str);
-
-	/* Carrier Board ENV */
-	var_carrier_eeprom_read(VAR_CARRIER_EEPROM_I2C_NAME, CARRIER_EEPROM_ADDR, &carrier_eeprom);
-	var_carrier_eeprom_get_revision(&carrier_eeprom, carrier_rev, sizeof(carrier_rev));
-	env_set("carrier_rev", carrier_rev);
-
-	if (extract_carrier_name(carrier_rev, carrier_name) > 0)
-		env_set("carrier_name", carrier_name);
-
 
 	/* SoM Features */
 	if (ep->features & VAR_EEPROM_F_WBE)
@@ -226,22 +148,5 @@ int board_late_init(void)
 		break;
 	}
 #endif
-	return 0;
-}
-
-int checkboard(void)
-{
-	if (get_board_id() == DART_MX91) {
-		struct var_carrier_eeprom carrier_eeprom;
-		char carrier_rev[CARRIER_REV_LEN] = {0};
-		char carrier_name[CARRIER_REV_LEN] = {0};
-
-		var_carrier_eeprom_read(VAR_CARRIER_EEPROM_I2C_NAME, CARRIER_EEPROM_ADDR, &carrier_eeprom);
-		var_carrier_eeprom_get_revision(&carrier_eeprom, carrier_rev, sizeof(carrier_rev));
-
-		if (extract_carrier_name(carrier_rev, carrier_name) > 0)
-			printf("Board: %c%s\n", toupper(carrier_name[0]), carrier_name + 1);
-	}
-
 	return 0;
 }
