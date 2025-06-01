@@ -179,6 +179,7 @@
 #define PHYS_SDRAM_2_SIZE 		0x180000000 /* 6GB */
 
 #define DEFAULT_SDRAM_SIZE		(4UL * SZ_1G) /* 4GB Minimum DDR5, see get_dram_size */
+#define VAR_EEPROM_DRAM_START	(PHYS_SDRAM + (DEFAULT_SDRAM_SIZE >> 1))
 
 #define CFG_SYS_FSL_USDHC_NUM	2
 

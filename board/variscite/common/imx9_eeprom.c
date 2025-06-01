@@ -209,7 +209,8 @@ void var_eeprom_print_prod_info(struct var_eeprom *ep)
 }
 #endif
 
-#if defined(CONFIG_SPL_BUILD) && (defined(CONFIG_TARGET_IMX93_VAR_SOM) || defined(CONFIG_TARGET_IMX91_VAR_SOM))
+#if defined(CONFIG_SPL_BUILD) && (defined(CONFIG_TARGET_IMX93_VAR_SOM) || \
+                                  defined(CONFIG_TARGET_IMX91_VAR_SOM))
 static int var_eeprom_crc32(struct var_eeprom *ep, const uint32_t offset,
 			    const uint32_t len, uint32_t *crc32_val)
 {
@@ -221,6 +222,7 @@ static int var_eeprom_crc32(struct var_eeprom *ep, const uint32_t offset,
 	if (!var_eeprom_is_valid(ep))
 		return -1;
 
+#if defined(CONFIG_TARGET_IMX93_VAR_SOM) || defined(CONFIG_TARGET_IMX91_VAR_SOM)
 	ret = var_eeprom_get_dev(&dev);
 	if (ret) {
 		debug("%s: Failed 2 to detect I2C EEPROM\n", __func__);
@@ -237,6 +239,13 @@ static int var_eeprom_crc32(struct var_eeprom *ep, const uint32_t offset,
 	}
 
 	debug("%s: crc32=0x%08x (offset=%d len=%d)\n", __func__, *crc32_val, offset, len);
+#elif defined(CONFIG_TARGET_IMX95_VAR_DART) && defined(CONFIG_SCMI_FIRMWARE)
+	ret = var_scmi_eeprom_read((u8 *)ep, sizeof(*ep));
+	if (ret) {
+		printf("%s: SCMI EEPROM read failed, ret=%d\n", __func__, ret);
+		return ret;
+	}
+#endif
 
 	return 0;
 }
@@ -262,6 +271,7 @@ static void adjust_dram_table(u16 adj_table_offset, u16 adj_table_size,
 	struct udevice *dev;
 
 	/* Get EEPROM device */
+#if defined(CONFIG_TARGET_IMX93_VAR_SOM) || defined(CONFIG_TARGET_IMX91_VAR_SOM)
 	ret = var_eeprom_get_dev(&dev);
 	if (ret) {
 		debug("%s: Failed to detect I2C EEPROM\n", __func__);
@@ -285,6 +295,14 @@ static void adjust_dram_table(u16 adj_table_offset, u16 adj_table_size,
 
 		off += sizeof(adj_table_row);
 	}
+#elif defined(CONFIG_TARGET_IMX95_VAR_DART) && defined(CONFIG_SCMI_FIRMWARE)
+	debug("%s: Calling SCMI to read EEPROM\n", __func__);
+	ret = var_scmi_eeprom_read((u8 *)dev, sizeof(dev));
+	if (ret) {
+		printf("%s: SCMI EEPROM read failed, ret=%d\n", __func__, ret);
+		return;
+	}
+#endif
 }
 
 /*
