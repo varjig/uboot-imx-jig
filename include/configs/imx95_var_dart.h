@@ -56,6 +56,9 @@
 	"backlight_disable=gpio clear GPIO2_25\0" \
 	"backlight_enable=gpio set GPIO2_25\0" \
 	"console=ttyLP0,115200 earlycon\0" \
+	"eth0_exists=undefined\0" \
+	"dtbo_eth0_buffer_size=16384\0" \
+	"dtbo_eth0_file=imx95-var-dart-jig-eth0.dtbo\0" \
 	"fdt_addr_r=0x93000000\0" \
 	"fdt_addr=0x93000000\0" \
 	"fdt_high=0xffffffffffffffff\0"	 \
@@ -83,9 +86,13 @@
 	"loadimage=load mmc ${mmcdev}:${mmcpart} ${img_addr} ${bootdir}/${image};" \
 		"unzip ${img_addr} ${loadaddr}\0" \
 	"findfdt=" \
-		"if test $fdt_file = undefined; then " \
+		"if test ${fdt_file} = undefined; then " \
 			"setenv fdt_file imx95-var-dart-jig.dtb; " \
 		"fi; \0" \
+	"load_eth0_dtbo=setexpr fdtovaddr ${fdt_addr} + 0xF0000; " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_eth0_buffer_size}; " \
+	    "load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_eth0_file}; " \
+	    "fdt apply ${fdtovaddr};\0" \
 	"loadfdt=run findfdt; " \
 		"echo fdt_file=${fdt_file}; " \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${bootdir}/${fdt_file}\0" \
@@ -107,15 +114,19 @@
 				"bootm ${loadaddr}; " \
 			"else " \
 				"if run loadfdt; then " \
+					"if test ${eth0_exists} = yes; then " \
+						"echo Loading eth0 dtbo ...; " \
+						"run load_eth0_dtbo; " \
+					"fi; " \
 					"run boot_os; " \
 				"else " \
 					"echo WARN: Cannot load the DT; " \
 				"fi; " \
 			"fi;" \
 		"fi;\0" \
-		"netargs=setenv bootargs ${mcore_args} console=${console} " \
-		"root=/dev/nfs " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+	"netargs=setenv bootargs ${mcore_args} console=${console} " \
+	"root=/dev/nfs " \
+	"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
 		"run netargs;  " \
 		"run optargs; " \
