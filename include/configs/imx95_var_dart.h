@@ -59,6 +59,9 @@
 	"eth0_exists=undefined\0" \
 	"dtbo_eth0_buffer_size=16384\0" \
 	"dtbo_eth0_file=imx95-var-dart-jig-eth0.dtbo\0" \
+	"sai3_exists=undefined\0" \
+	"dtbo_sai3_buffer_size=16384\0" \
+	"dtbo_sai3_file=imx95-var-dart-jig-sai3.dtbo\0" \
 	"fdt_addr_r=0x93000000\0" \
 	"fdt_addr=0x93000000\0" \
 	"fdt_high=0xffffffffffffffff\0"	 \
@@ -93,6 +96,10 @@
 		"fdt addr ${fdt_addr} && fdt resize ${dtbo_eth0_buffer_size}; " \
 	    "load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_eth0_file}; " \
 	    "fdt apply ${fdtovaddr};\0" \
+	"load_sai3_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x1E0000; " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_sai3_buffer_size}; " \
+	    "load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_sai3_file}; " \
+	    "fdt apply ${fdtovaddr};\0" \
 	"loadfdt=run findfdt; " \
 		"echo fdt_file=${fdt_file}; " \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${bootdir}/${fdt_file}\0" \
@@ -117,6 +124,10 @@
 					"if test ${eth0_exists} = yes; then " \
 						"echo Loading eth0 dtbo ...; " \
 						"run load_eth0_dtbo; " \
+					"fi; " \
+					"if test ${sai3_exists} = yes; then " \
+						"echo Loading sai3 dtbo ...; " \
+						"run load_sai3_dtbo; " \
 					"fi; " \
 					"run boot_os; " \
 				"else " \
