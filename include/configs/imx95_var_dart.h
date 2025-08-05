@@ -59,9 +59,9 @@
 	"eth0_exists=undefined\0" \
 	"dtbo_eth0_buffer_size=16384\0" \
 	"dtbo_eth0_file=imx95-var-dart-jig-eth0.dtbo\0" \
-	"sai3_exists=undefined\0" \
-	"dtbo_sai3_buffer_size=16384\0" \
-	"dtbo_sai3_file=imx95-var-dart-jig-sai3.dtbo\0" \
+	"audio_exists=undefined\0" \
+	"dtbo_audio_buffer_size=16384\0" \
+	"dtbo_audio_file=imx95-var-dart-jig-audio.dtbo\0" \
 	"dsi_exists=undefined\0" \
 	"dtbo_dsi_buffer_size=16384\0" \
 	"dtbo_dsi_file=imx95-var-dart-jig-dsi.dtbo\0" \
@@ -108,9 +108,9 @@
 		"fdt addr ${fdt_addr} && fdt resize ${dtbo_eth0_buffer_size}; " \
 		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_eth0_file}; " \
 		"fdt apply ${fdtovaddr};\0" \
-	"load_sai3_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x1E0000; " \
-		"fdt addr ${fdt_addr} && fdt resize ${dtbo_sai3_buffer_size}; " \
-		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_sai3_file}; " \
+	"load_audio_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x1E0000; " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_audio_buffer_size}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_audio_file}; " \
 		"fdt apply ${fdtovaddr};\0" \
 	"load_dsi_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x2D0000; " \
 		"fdt addr ${fdt_addr} && fdt resize ${dtbo_dsi_buffer_size}; " \
@@ -153,9 +153,9 @@
 						"echo Loading eth0 dtbo ...; " \
 						"run load_eth0_dtbo; " \
 					"fi; " \
-					"if test ${sai3_exists} = yes; then " \
-						"echo Loading sai3 dtbo ...; " \
-						"run load_sai3_dtbo; " \
+					"if test ${audio_exists} = yes; then " \
+						"echo Loading audio dtbo ...; " \
+						"run load_audio_dtbo; " \
 					"fi; " \
 					"if test ${dsi_exists} = yes; then " \
 						"echo Loading dsi dtbo ...; " \
