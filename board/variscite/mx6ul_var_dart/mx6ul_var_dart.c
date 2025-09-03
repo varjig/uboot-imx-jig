@@ -1072,18 +1072,33 @@ void spl_dram_init(void)
 {
 	int i;
 	struct var_eeprom_v2_cfg var_eeprom_v2_cfg = {0};
+	char pressed;
+
+	/* Clear receiver queue */
+        while(tstc()!=0)
+                getc();	
 
 	puts("Do you want to boot with:\n\tLEGACY - 0,\n\tWINBOND - 1\nDDR Settings?\n");
-	for(i = 0; i < 30; i++)
+	for(i = 0; i < 25; i++)
 	{
 		mdelay(100);
 	        if(tstc()!=0)
 			break;
 	}
 
-	if(tstc()!=0)
-	{
-		switch(getc())
+        if(tstc()!=0)
+        {
+		mdelay(500);
+		/* Use only the last character recived */
+		puts("Pressed ");
+		while(tstc()!=0)
+		{
+			pressed=getc();
+			puts(pressed);
+		}
+		puts("\n");
+
+		switch(pressed)
 		{
 			case '1':
 				puts("WINBOND 128M configuration\n");
