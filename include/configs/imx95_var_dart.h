@@ -57,6 +57,24 @@
 	"backlight_disable=gpio clear GPIO2_25\0" \
 	"backlight_enable=gpio set GPIO2_25\0" \
 	"console=ttyLP0,115200 earlycon\0" \
+	"eth0_exists=undefined\0" \
+	"dtbo_eth0_buffer_size=16384\0" \
+	"dtbo_eth0_file=imx95-var-dart-jig-eth0.dtbo\0" \
+	"audio_exists=undefined\0" \
+	"dtbo_audio_buffer_size=16384\0" \
+	"dtbo_audio_file=imx95-var-dart-jig-audio.dtbo\0" \
+	"dsi_exists=undefined\0" \
+	"dtbo_dsi_buffer_size=16384\0" \
+	"dtbo_dsi_file=imx95-var-dart-jig-dsi.dtbo\0" \
+	"mipi_csi1_exists=undefined\0" \
+	"dtbo_mipi_csi1_buffer_size=16384\0" \
+	"dtbo_mipi_csi1_file=imx95-var-dart-jig-mipi-csi1.dtbo\0" \
+	"lvds1_exists=undefined\0" \
+	"dtbo_lvds1_buffer_size=16384\0" \
+	"dtbo_lvds1_file=imx95-var-dart-jig-lvds1.dtbo\0" \
+	"usdhc3_exists=undefined\0" \
+	"dtbo_usdhc3_buffer_size=16384\0" \
+	"dtbo_usdhc3_file=imx95-var-dart-jig-usdhc3.dtbo\0" \
 	"fdt_addr_r=0x93000000\0" \
 	"fdt_addr=0x93000000\0" \
 	"fdt_high=0xffffffffffffffff\0"	 \
@@ -85,8 +103,32 @@
 		"unzip ${img_addr} ${loadaddr}\0" \
 	"findfdt=" \
 		"if test $fdt_file = undefined; then " \
-			"setenv fdt_file imx95-var-dart-${carrier_name}${m7_dtb_suffix}.dtb;" \
+			"setenv fdt_file imx95-var-dart-jig.dtb;" \
 		"fi; \0" \
+	"load_eth0_dtbo=setexpr fdtovaddr ${fdt_addr} + 0xF0000; " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_eth0_buffer_size}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_eth0_file}; " \
+		"fdt apply ${fdtovaddr};\0" \
+	"load_audio_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x1E0000; " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_audio_buffer_size}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_audio_file}; " \
+		"fdt apply ${fdtovaddr};\0" \
+	"load_dsi_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x2D0000; " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_dsi_buffer_size}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_dsi_file}; " \
+		"fdt apply ${fdtovaddr};\0" \
+	"load_mipi_csi1_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x3C0000; " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_mipi_csi1_buffer_size}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_mipi_csi1_file}; " \
+		"fdt apply ${fdtovaddr};\0" \
+	"load_lvds1_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x4B0000; " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_lvds1_buffer_size}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_lvds1_file}; " \
+		"fdt apply ${fdtovaddr};\0" \
+	"load_usdhc3_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x5A0000; " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_usdhc3_buffer_size}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_usdhc3_file}; " \
+		"fdt apply ${fdtovaddr};\0" \
 	"loadfdt=run findfdt; " \
 		"echo fdt_file=${fdt_file}; " \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${bootdir}/${fdt_file}\0" \
@@ -115,6 +157,30 @@
 				"bootm ${loadaddr}; " \
 			"else " \
 				"if run loadfdt; then " \
+					"if test ${eth0_exists} = yes; then " \
+						"echo Loading eth0 dtbo ...; " \
+						"run load_eth0_dtbo; " \
+					"fi; " \
+					"if test ${audio_exists} = yes; then " \
+						"echo Loading audio dtbo ...; " \
+						"run load_audio_dtbo; " \
+					"fi; " \
+					"if test ${dsi_exists} = yes; then " \
+						"echo Loading dsi dtbo ...; " \
+						"run load_dsi_dtbo; " \
+					"fi; " \
+					"if test ${mipi_csi1_exists} = yes; then " \
+						"echo Loading mipi_csi1 dtbo ...; " \
+						"run load_mipi_csi1_dtbo; " \
+					"fi; " \
+					"if test ${lvds1_exists} = yes; then " \
+						"echo Loading lvds1 dtbo ...; " \
+						"run load_lvds1_dtbo; " \
+					"fi; " \
+					"if test ${usdhc3_exists} = yes; then " \
+						"echo Loading usdhc3 dtbo ...; " \
+						"run load_usdhc3_dtbo; " \
+					"fi; " \
 					"run boot_os; " \
 				"else " \
 					"echo WARN: Cannot load the DT; " \
