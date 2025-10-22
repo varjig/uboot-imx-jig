@@ -9,7 +9,7 @@
 #include "imx91-var-som.dtsi"
 
 /{
-	model = "Variscite VAR-SOM-MX91 on Symphony-Board";
+	model = "Variscite VAR-SOM-MX91 on Jig";
 	compatible = "variscite,imx91-var-som", "fsl,imx91";
 
 	chosen {
