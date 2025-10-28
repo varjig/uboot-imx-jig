@@ -100,6 +100,9 @@ int power_init_board(void)
 	int ret;
 	unsigned int val = 0, buck_val;
 
+	// Sometimes PMIC looses the first I2C access on the JIG. So we do a first
+	// dummy access to the PMIC to ensure it is ready then do a real access.
+	pmic_get("pmic@25", &dev);
 	ret = pmic_get("pmic@25", &dev);
 	if (ret != 0) {
 		puts("ERROR: Get PMIC PCA9451A failed!\n");
