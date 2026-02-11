@@ -181,9 +181,23 @@
 
 #define CFG_SYS_SDRAM_BASE           0x90000000
 #define PHYS_SDRAM                      0x90000000
+#if defined(CONFIG_IMX95_VAR_DART_16GB)
+/* Totally 16GB */
+#define PHYS_SDRAM_SIZE			0x70000000UL /* 2GB  - 256MB DDR */
+#define PHYS_SDRAM_2_SIZE 		0x380000000 /* 14GB */
+#elif defined(CONFIG_IMX95_VAR_DART_2GB)
+/* Totally 2GB */
+#define PHYS_SDRAM_SIZE			0x70000000UL /* 2GB  - 256MB DDR */
+#define PHYS_SDRAM_2_SIZE 		0x0 /* 0GB */
+#elif defined(CONFIG_IMX95_VAR_DART_4GB)
+/* Totally 4GB */
+#define PHYS_SDRAM_SIZE			0x70000000UL /* 2GB  - 256MB DDR */
+#define PHYS_SDRAM_2_SIZE 		0x80000000 /* 2GB */
+#else
 /* Totally 8GB */
 #define PHYS_SDRAM_SIZE			0x70000000UL /* 2GB  - 256MB DDR */
 #define PHYS_SDRAM_2_SIZE 		0x180000000 /* 6GB */
+#endif
 
 #define DEFAULT_SDRAM_SIZE		(4UL * SZ_1G) /* 4GB Minimum DDR5, see get_dram_size */
 
