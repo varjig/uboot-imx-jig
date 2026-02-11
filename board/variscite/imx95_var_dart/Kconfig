@@ -9,4 +9,24 @@ config SYS_VENDOR
 config SYS_CONFIG_NAME
 	default "imx95_var_dart"
 
+choice
+	prompt "DART-MX95 DRAM size"
+	default IMX95_VAR_DART_8GB
+	help
+	  Select the DRAM size for the DART-MX95.
+
+config IMX95_VAR_DART_2GB
+	bool "2GB"
+
+config IMX95_VAR_DART_4GB
+	bool "4GB"
+
+config IMX95_VAR_DART_8GB
+	bool "8GB"
+
+config IMX95_VAR_DART_16GB
+	bool "16GB"
+
+endchoice
+
 endif
