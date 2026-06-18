@@ -484,7 +484,7 @@ void var_carrier_eeprom_get_revision(struct var_carrier_eeprom *ep,
 		strncpy(rev, (const char *)ep->carrier_rev, size);
 	} else { /* Default values if EEPROM can't be read */
 		if (som_type == VAR_DART)
-			strncpy(rev, "sonata", size);
+			strncpy(rev, "jig", size);
 		else
 			strncpy(rev, "symphony", size);
 	}
