@@ -1,0 +1,15 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2019 NXP
+ * Copyright 2026 Variscite Ltd.
+ */
+
+#include "imx8mp-var-common-u-boot.dtsi"
+
+&pinctrl_uart2 {
+	bootph-pre-ram;
+};
+
+&uart2 {
+	bootph-pre-ram;
+};
