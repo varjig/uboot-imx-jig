@@ -112,7 +112,7 @@
 				"setenv carrier_default sonata; " \
 			"else " \
 				"setenv module_name imx8mp-var-smarc; " \
-				"setenv carrier_default echo; " \
+				"setenv carrier_default jig; " \
 			"fi; " \
 			"if test ${carrier_name} = undefined; then " \
 				"setenv carrier_name ${carrier_default}; " \

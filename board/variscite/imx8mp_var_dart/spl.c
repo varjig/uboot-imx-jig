@@ -248,7 +248,7 @@ int board_fit_config_name_match(const char *name)
 		return 0;
 	} else if ((board_id == BOARD_ID_SOM) && !strcmp(name, "imx8mp-var-som-symphony")) {
 		return 0;
-	} else if ((board_id == BOARD_ID_SMARC) && !strcmp(name, "imx8mp-var-smarc-echo")) {
+	} else if ((board_id == BOARD_ID_SMARC) && !strcmp(name, "imx8mp-var-smarc-jig")) {
 		return 0;
 	}
 
