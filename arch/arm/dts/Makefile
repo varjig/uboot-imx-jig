@@ -798,7 +798,7 @@ dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mp-evk.dtb \
 	imx8mp-var-dart-jig.dtb \
         imx8mp-var-som-jig.dtb \
-	imx8mp-var-smarc-echo.dtb \
+	imx8mp-var-smarc-jig.dtb \
 	imx8mp-var-dart-dt8mcustomboard.dtb \
 	imx8mp-var-dart-dt8mcustomboard-legacy.dtb \
 	imx8mp-var-som-symphony.dtb \
