@@ -99,6 +99,8 @@
 		"if test $fdt_file = undefined; then " \
 			"if test $board_name = VAR-SOM-MX8M-PLUS; then " \
 				"setenv fdt_file imx8mp-var-som-jig.dtb; " \
+			"elif test $board_name = VAR-SMARC-MX8M-PLUS; then " \
+				"setenv fdt_file imx8mp-var-smarc-jig.dtb; " \
 			"else " \
 				"setenv fdt_file imx8mp-var-dart-jig.dtb; " \
 			"fi; " \
