@@ -134,6 +134,7 @@ struct i2c_pads_info i2c_pads_som = {
 
 #define USDHC2_RST_GPIO_DART IMX_GPIO_NR(2, 19)
 #define USDHC2_RST_GPIO_SOM  IMX_GPIO_NR(4, 22)
+#define USDHC2_RST_GPIO_SMARC IMX_GPIO_NR(1, 8)
 #define JIG_ONOFF_GPIO_DART  IMX_GPIO_NR(5, 6)
 
 #define USDHC_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE |PAD_CTL_PE | \
@@ -174,6 +175,10 @@ static iomux_v3_cfg_t const usdhc2_rst_pads_som[] = {
 	MX8MP_PAD_SAI2_RXC__GPIO4_IO22 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
 
+static iomux_v3_cfg_t const usdhc2_rst_pads_smarc[] = {
+	MX8MP_PAD_GPIO1_IO08__GPIO1_IO08 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+};
+
 static struct fsl_esdhc_cfg usdhc_cfg[2] = {
 	{USDHC2_BASE_ADDR, 0, 4},
 	{USDHC3_BASE_ADDR, 0, 8},
@@ -204,6 +209,12 @@ int board_mmc_init(bd_t *bis)
 				imx_iomux_v3_setup_multiple_pads(
 					usdhc2_rst_pads_dart,
 					ARRAY_SIZE(usdhc2_rst_pads_dart));
+			}
+			else if (board_id == BOARD_ID_SMARC) {
+				rst_gpio = USDHC2_RST_GPIO_SMARC;
+				imx_iomux_v3_setup_multiple_pads(
+					usdhc2_rst_pads_smarc,
+					ARRAY_SIZE(usdhc2_rst_pads_smarc));
 			}
 			else {
 				rst_gpio = USDHC2_RST_GPIO_SOM;
@@ -318,6 +329,8 @@ int board_fit_config_name_match(const char *name)
 	if ((id == BOARD_ID_DART) && !strcmp(name, "imx8mp-var-dart-jig"))
 		return 0;
 	else if ((id == BOARD_ID_SOM) && !strcmp(name, "imx8mp-var-som-jig"))
+		return 0;
+	else if ((id == BOARD_ID_SMARC) && !strcmp(name, "imx8mp-var-smarc-jig"))
 		return 0;
 
 	return -1;
