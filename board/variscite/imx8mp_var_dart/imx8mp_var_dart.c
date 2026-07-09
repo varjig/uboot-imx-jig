@@ -75,15 +75,18 @@ int board_early_init_f(void)
 }
 
 #define GPIO_PAD_CTRL (PAD_CTL_HYS | PAD_CTL_DSE1 | PAD_CTL_PUE | PAD_CTL_PE)
+#define SMARC_ID_PAD_CTRL (PAD_CTL_HYS | PAD_CTL_DSE1 | PAD_CTL_PE)
 
 #ifdef CONFIG_SPL_BUILD
 
 #define BOARD_DETECT_GPIO IMX_GPIO_NR(2, 11)
 #define SOM_WIFI_EN_GPIO IMX_GPIO_NR(2, 19)
+#define SMARC_DETECT_GPIO IMX_GPIO_NR(2, 7)
 
 static iomux_v3_cfg_t const board_detect_pads[] = {
 	MX8MP_PAD_SD1_STROBE__GPIO2_IO11 | MUX_PAD_CTRL(GPIO_PAD_CTRL),
 	MX8MP_PAD_SD2_RESET_B__GPIO2_IO19 | MUX_PAD_CTRL(GPIO_PAD_CTRL),
+	MX8MP_PAD_SD1_DATA5__GPIO2_IO07 | MUX_PAD_CTRL(SMARC_ID_PAD_CTRL),
 };
 #endif
 
@@ -113,18 +116,28 @@ int var_detect_board_id(void)
 	if (gpio_get_value(BOARD_DETECT_GPIO))
 		board_id = BOARD_ID_SOM;
 	else
-		board_id = BOARD_ID_DART;
+		board_id = BOARD_ID_UNDEF;
 
 	if(board_id==BOARD_ID_SOM)
 		gpio_set_value(SOM_WIFI_EN_GPIO,0);
 
 	gpio_free(BOARD_DETECT_GPIO);
 	gpio_free(SOM_WIFI_EN_GPIO);
+
+	if (board_id == BOARD_ID_UNDEF) {
+		gpio_request(SMARC_DETECT_GPIO, "smarc_detect");
+		gpio_direction_input(SMARC_DETECT_GPIO);
+		board_id = gpio_get_value(SMARC_DETECT_GPIO) ?
+			BOARD_ID_SMARC : BOARD_ID_DART;
+		gpio_free(SMARC_DETECT_GPIO);
+	}
 #else
 	if (of_machine_is_compatible("variscite,imx8mp-var-som"))
 		board_id = BOARD_ID_SOM;
 	else if (of_machine_is_compatible("variscite,imx8mp-var-dart"))
 		board_id = BOARD_ID_DART;
+	else if (of_machine_is_compatible("variscite,imx8mp-var-smarc"))
+		board_id = BOARD_ID_SMARC;
 #endif
 
 	return board_id;
@@ -460,6 +473,10 @@ int board_late_init(void)
 	else if (board_id == BOARD_ID_DART) {
 		env_set("board_name", "DART-MX8M-PLUS");
 		env_set("dart_carrier_rev", "ji v1.0");
+	}
+	else if (board_id == BOARD_ID_SMARC) {
+		env_set("board_name", "VAR-SMARC-MX8M-PLUS");
+		env_set("console", "ttymxc1,115200");
 	}
 
 	var_setup_mac(ep);

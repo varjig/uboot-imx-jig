@@ -4,6 +4,7 @@
 enum {
 	BOARD_ID_SOM,
 	BOARD_ID_DART,
+	BOARD_ID_SMARC,
 	BOARD_ID_UNDEF,
 };
 
