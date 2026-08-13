@@ -1068,6 +1068,21 @@ u8 default_winbond_128_conf[]=
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x04, 0xff
 };
 
+
+void erase_eeprom_magic(void)
+{
+	u8 val = 0x00;
+
+	i2c_set_bus_num(VAR_DART_EEPROM_I2C_BUS);
+	if (i2c_probe(VAR_DART_EEPROM_I2C_ADDR)) {
+		puts("Error: couldn't find EEPROM device\n");
+		return;
+	}
+
+	if (i2c_write(VAR_DART_EEPROM_I2C_ADDR, 0x0, 1, &val, 1))
+		puts("Error erasing EEPROM magic\n");
+}
+
 void spl_dram_init(void)
 {
 	int i;
@@ -1078,7 +1093,7 @@ void spl_dram_init(void)
         while(tstc()!=0)
                 getc();	
 
-	puts("Do you want to boot with:\n\tLEGACY - 0,\n\tWINBOND - 1\nDDR Settings?\n");
+	puts("Do you want to erase the EEPROM magic and boot with:\n\tLEGACY - 0,\n\tWINBOND - 1\nDDR Settings?\n");
 	for(i = 0; i < 25; i++)
 	{
 		mdelay(100);
@@ -1103,9 +1118,11 @@ void spl_dram_init(void)
 			case '1':
 				puts("WINBOND 128M configuration\n");
 			        var_eeprom_v2_dram_init((struct var_eeprom_v2_cfg*)default_winbond_128_conf);
+				erase_eeprom_magic();
 				return;
 			default:
 				legacy_dram_init();
+				erase_eeprom_magic();
 				return;
 		}
 	}
