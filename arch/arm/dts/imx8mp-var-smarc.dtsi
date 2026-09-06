@@ -46,7 +46,7 @@
 				regulator-max-microvolt = <1800000>;
 			};
 		};
-
+/*
 		ethphy1: ethernet-phy@5 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <5>;
@@ -62,9 +62,11 @@
 				regulator-max-microvolt = <1800000>;
 			};
 		};
+*/
 	};
 };
 
+/*
 &fec {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec>;
@@ -72,6 +74,7 @@
 	phy-handle = <&ethphy1>;
 	status = "okay";
 };
+*/
 
 &gpio4 {
 	/* Release the PCAL6416 GPIO expander from reset */
