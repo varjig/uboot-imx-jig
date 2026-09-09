@@ -103,6 +103,32 @@ static void setup_iomux_onoff(void)
 	gpio_direction_output(ONOFF_GPIO, 1);
 }
 
+#define J1_28_GPIO	IMX_GPIO_NR(2, 19)
+#define J1_28_PAD \
+	(IMX8MM_PAD_SD2_RESET_B_GPIO2_IO19 | MUX_PAD_CTRL(0x41))
+
+static int setup_j1_28(void)
+{
+	int ret;
+
+	if (get_board_id() != DART_MX8M_MINI)
+		return 0;
+
+	/* J1.28 high turns Q2 on and pulls the SoM POR_B signal low. */
+	imx_iomux_v3_setup_pad(J1_28_PAD);
+	ret = gpio_request(J1_28_GPIO, "j1_28_reset_guard");
+	if (ret) {
+		printf("Failed to request J1.28 reset guard GPIO: %d\n", ret);
+		return ret;
+	}
+
+	ret = gpio_direction_output(J1_28_GPIO, 0);
+	if (ret)
+		printf("Failed to drive J1.28 low: %d\n", ret);
+
+	return ret;
+}
+
 extern struct mxc_uart *mxc_base;
 
 int board_early_init_f(void)
@@ -241,6 +267,12 @@ static void setup_usb(void)
 
 int board_init(void)
 {
+	int ret;
+
+	ret = setup_j1_28();
+	if (ret)
+		return ret;
+
 	setup_iomux_onoff();
 #ifdef CONFIG_FEC_MXC
 	setup_fec();

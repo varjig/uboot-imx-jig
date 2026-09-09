@@ -170,6 +170,29 @@ static iomux_v3_cfg_t const usdhc2_pads[] = {
 	IMX8MM_PAD_SD2_DATA3_USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 };
 
+#define J1_28_GPIO	IMX_GPIO_NR(2, 19)
+#define J1_28_PAD \
+	(IMX8MM_PAD_SD2_RESET_B_GPIO2_IO19 | MUX_PAD_CTRL(0x41))
+
+static int spl_setup_j1_28(void)
+{
+	int ret;
+
+	/* J1.28 high turns Q2 on and pulls the SoM POR_B signal low. */
+	imx_iomux_v3_setup_pad(J1_28_PAD);
+	ret = gpio_request(J1_28_GPIO, "j1_28_reset_guard");
+	if (ret) {
+		printf("Failed to request J1.28 reset guard GPIO: %d\n", ret);
+		return ret;
+	}
+
+	ret = gpio_direction_output(J1_28_GPIO, 0);
+	if (ret)
+		printf("Failed to drive J1.28 low: %d\n", ret);
+
+	return ret;
+}
+
 static struct fsl_esdhc_cfg usdhc_cfg[2] = {
 	{USDHC2_BASE_ADDR, 0, 4},
 	{USDHC3_BASE_ADDR, 0, 8},
@@ -188,6 +211,11 @@ int board_mmc_init(bd_t *bis)
 	for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++) {
 		switch (i) {
 		case 0:
+			if (get_board_id() == DART_MX8M_MINI) {
+				ret = spl_setup_j1_28();
+				if (ret)
+					return ret;
+			}
 			init_clk_usdhc(1);
 			usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
 			imx_iomux_v3_setup_multiple_pads(usdhc2_pads,
