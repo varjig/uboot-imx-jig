@@ -78,6 +78,9 @@
 	"v2_exists=no\0" \
 	"dtbo_v2_buffer_size=16384\0" \
 	"dtbo_v2_file=imx95-var-dart-jig-v2.dtbo\0" \
+	"tpm_exists=undefined\0" \
+	"dtbo_tpm_buffer_size=16384\0" \
+	"dtbo_tpm_file=imx95-var-dart-jig-v2-tpm.dtbo\0" \
 	"fdt_addr_r=0x93000000\0" \
 	"fdt_addr=0x93000000\0" \
 	"fdt_high=0xffffffffffffffff\0"	 \
@@ -136,6 +139,10 @@
 		"fdt addr ${fdt_addr} && fdt resize ${dtbo_v2_buffer_size} && " \
 		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_v2_file} && " \
 		"fdt apply ${fdtovaddr};\0" \
+	"load_tpm_dtbo=setexpr fdtovaddr ${fdt_addr} + 0x780000 && " \
+		"fdt addr ${fdt_addr} && fdt resize ${dtbo_tpm_buffer_size} && " \
+		"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${dtbo_tpm_file} && " \
+		"fdt apply ${fdtovaddr};\0" \
 	"loadfdt=run findfdt; " \
 		"echo fdt_file=${fdt_file}; " \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${bootdir}/${fdt_file}\0" \
@@ -187,13 +194,28 @@
 					"if test \"${v2_exists}\" = yes; then " \
 						"echo Loading v2 dtbo ...; " \
 						"if run load_v2_dtbo; then " \
-							"run boot_os; " \
+							"if test \"${tpm_exists}\" = yes; then " \
+								"echo Loading TPM dtbo ...; " \
+								"if run load_tpm_dtbo; then " \
+									"run boot_os; " \
+								"else " \
+									"echo ERROR: Cannot load or apply TPM DT overlay; " \
+									"false; " \
+								"fi; " \
+							"else " \
+								"run boot_os; " \
+							"fi; " \
 						"else " \
 							"echo ERROR: Cannot load or apply v2 DT overlay; " \
 							"false; " \
 						"fi; " \
 					"else " \
-						"run boot_os; " \
+						"if test \"${tpm_exists}\" = yes; then " \
+							"echo ERROR: TPM requires the v2 DT overlay; " \
+							"false; " \
+						"else " \
+							"run boot_os; " \
+						"fi; " \
 					"fi; " \
 				"else " \
 					"echo WARN: Cannot load the DT; " \
