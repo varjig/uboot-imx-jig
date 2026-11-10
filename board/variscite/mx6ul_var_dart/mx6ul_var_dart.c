@@ -1109,7 +1109,7 @@ void spl_dram_init(void)
 		while(tstc()!=0)
 		{
 			pressed=getc();
-			puts(pressed);
+			putc(pressed);
 		}
 		puts("\n");
 
