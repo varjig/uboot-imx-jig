@@ -1032,6 +1032,9 @@ static void legacy_dram_init(void)
 	mx6_dram_cfg(&ddr_sysinfo, &mx6_mmcd_calib, &mem_ddr);
 }
 
+/*
+ * Values based on VAR-SOM-6UL_V1_3_Y2_512R_1x4Gbit_W634GU6RB-11_ddr_script
+ */
 u8 default_winbond_128_conf[]=
 {
 	0x56, 0x41, 0x52, 0x32, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -1093,7 +1096,15 @@ void spl_dram_init(void)
         while(tstc()!=0)
                 getc();	
 
-	puts("Do you want to erase the EEPROM magic and boot with:\n\tLEGACY - 0,\n\tWINBOND - 1\nDDR Settings?\n");
+	puts("Select a DDR configuration to erase the EEPROM magic and boot:\n\t"
+			"0 - LEGACY\n\t"
+			"1 - VAR-SOM-6UL Y2 WINBOND\n\t"
+			"2 - VAR-SOM-6UL G2 WINBOND\n\t"
+			"3 - DART-6UL Y2 WINBOND\n\t"
+			"4 - DART-6UL G2 WINBOND\n\t"
+			"5 - DART-6UL-5G Y2 WINBOND\n\t"
+			"6 - DART-6UL-5G G2 WINBOND\n");
+
 	for(i = 0; i < 25; i++)
 	{
 		mdelay(100);
@@ -1116,15 +1127,87 @@ void spl_dram_init(void)
 		switch(pressed)
 		{
 			case '1':
-				puts("WINBOND 128M configuration\n");
+				puts("VAR-SOM-6UL Y2 WINBOND configuration\n");
 			        var_eeprom_v2_dram_init((struct var_eeprom_v2_cfg*)default_winbond_128_conf);
-				erase_eeprom_magic();
-				return;
+				break;
+			case '2':
+				puts("VAR-SOM-6UL G2 WINBOND configuration\n");
+
+				/* Values from VAR-SOM-6UL_V1_3_G2_512R_1x4Gbit_W634GU6RB-11_ddr_script */
+				default_winbond_128_conf[0x38]=0x4e;
+				default_winbond_128_conf[0x3c]=0x47;
+				default_winbond_128_conf[0x3d]=0x45;
+				default_winbond_128_conf[0x40]=0x4c;
+				default_winbond_128_conf[0x41]=0x52;
+				default_winbond_128_conf[0x44]=0x12;
+				default_winbond_128_conf[0x45]=0x10;
+				default_winbond_128_conf[0x46]=0x92;
+
+				var_eeprom_v2_dram_init((struct var_eeprom_v2_cfg*)default_winbond_128_conf);
+				break;
+			case '3':
+				puts("DART-6UL Y2 WINBOND configuration\n");
+
+				/* Values from DART-6UL_Y2_512R_1x4Gbit_W634GU6RB-11_ddr_script */
+				default_winbond_128_conf[0x38]=0x4b;
+				default_winbond_128_conf[0x3a]=0x42;
+				default_winbond_128_conf[0x3d]=0x32;
+				default_winbond_128_conf[0x40]=0x32;
+				default_winbond_128_conf[0x41]=0x39;
+
+				var_eeprom_v2_dram_init((struct var_eeprom_v2_cfg*)default_winbond_128_conf);
+				break;
+			case '4':
+				puts("DART-6UL G2 WINBOND configuration\n");
+
+				/* Values from DART-6UL_G2_512R_1x4Gbit_W634GU6RB-11_ddr_script */
+				default_winbond_128_conf[0x38]=0x54;
+				default_winbond_128_conf[0x3a]=0x48;
+				default_winbond_128_conf[0x3c]=0x4b;
+				default_winbond_128_conf[0x3d]=0x47;
+				default_winbond_128_conf[0x40]=0x4f;
+				default_winbond_128_conf[0x41]=0x54;
+				default_winbond_128_conf[0x44]=0x12;
+				default_winbond_128_conf[0x45]=0x10;
+				default_winbond_128_conf[0x46]=0x92;
+
+				var_eeprom_v2_dram_init((struct var_eeprom_v2_cfg*)default_winbond_128_conf);
+				break;
+			case '5':
+				puts("DART-6UL-5G Y2 WINBOND configuration\n");
+
+				/* Values from DART-6UL-5G_Y2_512R_1x4Gbit_W634GU6RB-11_ddr_script */
+				default_winbond_128_conf[0x38]=0x4e;
+				default_winbond_128_conf[0x3c]=0x31;
+				default_winbond_128_conf[0x3d]=0x2d;
+				default_winbond_128_conf[0x40]=0x34;
+				default_winbond_128_conf[0x41]=0x38;
+
+				var_eeprom_v2_dram_init((struct var_eeprom_v2_cfg*)default_winbond_128_conf);
+				break;
+			case '6':
+				puts("DART-6UL-5G G2 WINBOND configuration\n");
+
+				/* Values from DART-6UL-5G_G2_512R_1x4Gbit_W634GU6RB-11_ddr_script */
+				default_winbond_128_conf[0x38]=0x4d;
+				default_winbond_128_conf[0x3a]=0x45;
+				default_winbond_128_conf[0x3c]=0x46;
+				default_winbond_128_conf[0x3d]=0x46;
+				default_winbond_128_conf[0x40]=0x4c;
+				default_winbond_128_conf[0x41]=0x53;
+				default_winbond_128_conf[0x44]=0x12;
+				default_winbond_128_conf[0x45]=0x10;
+				default_winbond_128_conf[0x46]=0x92;
+
+				var_eeprom_v2_dram_init((struct var_eeprom_v2_cfg*)default_winbond_128_conf);
+				break;
 			default:
 				legacy_dram_init();
-				erase_eeprom_magic();
-				return;
+				break;
 		}
+
+		erase_eeprom_magic();
+		return;
 	}
 	else
 		if (var_eeprom_v2_read_struct(&var_eeprom_v2_cfg))
